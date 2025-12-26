@@ -1,13 +1,12 @@
-# Admin Dashboard Redesign Tasks
+# Centralize Node Modules Tasks
 
-- [x] Analyze current AdminPanel.jsx structure and functionality
-- [ ] Design new layout with sidebar navigation
-- [ ] Implement modern stats cards with improved styling
-- [ ] Redesign overview tab with better charts and recent activity
-- [ ] Update users tab with enhanced table design
-- [ ] Update questions tab with improved table
-- [ ] Update attempts tab with better table
-- [ ] Redesign add-question form with modern UI
-- [ ] Ensure responsive design across all components
-- [ ] Test all functionality remains intact
-- [ ] Final review and cleanup
+- [ ] Move all dependencies from backend/package.json to root package.json
+- [ ] Move all dependencies from frontend/package.json to root package.json
+- [ ] Update root package.json with all scripts from backend and frontend
+- [ ] Remove workspaces from root package.json
+- [ ] Delete backend/package.json
+- [ ] Delete frontend/package.json
+- [ ] Delete backend/package-lock.json
+- [ ] Delete frontend/package-lock.json
+- [ ] Install dependencies centrally
+- [ ] Test frontend and backend functionality
