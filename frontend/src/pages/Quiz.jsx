@@ -12,6 +12,7 @@ const Quiz = () => {
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes default
   const [error, setError] = useState(null);
+  const [mappings, setMappings] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +22,36 @@ const Quiz = () => {
         if (!data || data.length === 0) {
           setError("No questions available for this exam yet.");
         } else {
-          setQuestions(data);
+          // Shuffle options for each question
+          const shuffledQuestions = data.map(q => {
+            const originalOptions = [...q.options];
+            const shuffledOptions = [...q.options];
+            const mapping = [];
+
+            // Fisher-Yates shuffle
+            for (let i = shuffledOptions.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+            }
+
+            // Create mapping from shuffled index to original index
+            shuffledOptions.forEach((option, idx) => {
+              const originalIdx = originalOptions.indexOf(option);
+              mapping[idx] = originalIdx;
+            });
+
+            // Update correct index to match shuffled position
+            const newCorrect = mapping.indexOf(q.correct);
+
+            return {
+              ...q,
+              options: shuffledOptions,
+              correct: newCorrect,
+              mapping
+            };
+          });
+
+          setQuestions(shuffledQuestions);
         }
         setLoading(false);
       } catch (err) {
@@ -61,7 +91,7 @@ const Quiz = () => {
   const handleSubmit = async () => {
     const formattedResponses = Object.keys(responses).map(index => ({
       questionId: questions[index]._id,
-      selectedOption: responses[index]
+      selectedOption: questions[index].mapping[responses[index]]
     }));
 
     try {

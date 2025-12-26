@@ -1,13 +1,4 @@
-# Centralize Node Modules Tasks
-
-- [x] Move all dependencies from backend/package.json to root package.json
-- [x] Move all dependencies from frontend/package.json to root package.json
-- [x] Update root package.json with all scripts from backend and frontend
-- [x] Remove workspaces from root package.json
-- [x] Delete backend/package.json
-- [x] Delete frontend/package.json
-- [x] Delete backend/package-lock.json
-- [x] Delete frontend/package-lock.json
-- [x] Install dependencies centrally
-- [x] Test frontend and backend functionality
-- [x] Move .env file to root for backend to find it
+- [x] Edit vite.config.mjs to change proxy target from 'http://localhost:5000' to 'https://nursing-exam-portal.onrender.com'
+- [x] Edit frontend/src/api/axios.jsx to change baseURL from 'http://localhost:5000/api' to 'https://nursing-exam-portal.onrender.com/api'
+- [x] Edit test_admin_login.js to change login URL from 'http://localhost:5000/auth/login' to 'https://nursing-exam-portal.onrender.com/auth/login'
+- [x] Add open health check route to backend/server.js at '/api/health'
