@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/axios';
-import { useAuth } from '../context/AuthContext';
 import AdminNavbar from '../components/AdminNavbar';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, PieChart, Pie, Cell
 } from 'recharts';
 import {
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart
-} from 'recharts';
-import {
-  Download, Users, BarChart3, ShieldCheck, Search, Activity, ExternalLink, MoreVertical, Target, Award, Zap
+  Download, Users, BarChart3, ShieldCheck, Search, Activity, ExternalLink, MoreVertical, Target, Award, Zap, Home, FileText, PlusCircle, TrendingUp
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -26,6 +21,7 @@ const AdminPanel = () => {
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newQuestion, setNewQuestion] = useState({
     exam: '',
     topic: '',
@@ -457,4 +453,3 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
-import { useAuth } from '../context/AuthContext';

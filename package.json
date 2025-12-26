@@ -1,0 +1,14 @@
+{
+  "name": "nursing-exam-portal",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "frontend:dev": "npm run dev -w frontend",
+    "backend:dev": "npm run dev -w backend",
+    "install:all": "npm install"
+  }
+}
