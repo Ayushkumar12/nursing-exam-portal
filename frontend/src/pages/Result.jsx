@@ -259,6 +259,12 @@ const Result = () => {
                           })}
                         </div>
 
+                        <div className="mb-12 p-6 bg-emerald-50 border border-emerald-200 rounded-3xl">
+                          <p className="text-lg font-bold text-emerald-900">
+                            Correct Answer: {String.fromCharCode(65 + q.correct)}. {q.options[q.correct]}
+                          </p>
+                        </div>
+
                         <div className="p-10 rounded-[2.5rem] bg-indigo-50/30 border border-indigo-50 relative group transition-all hover:bg-indigo-50/50 overflow-hidden">
                           <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all group-hover:scale-110">
                             <Info size={120} strokeWidth={1} />

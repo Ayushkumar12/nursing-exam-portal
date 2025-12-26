@@ -3,6 +3,10 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import AdminNavbar from '../components/AdminNavbar';
 import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, PieChart, Pie, Cell
+} from 'recharts';
+import {
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart
 } from 'recharts';
 import {
@@ -22,6 +26,14 @@ const AdminPanel = () => {
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [newQuestion, setNewQuestion] = useState({
+    exam: '',
+    topic: '',
+    question: '',
+    options: ['', '', '', ''],
+    correct: 0,
+    explanation: ''
+  });
 
   useEffect(() => {
     fetchAdminData();
@@ -57,6 +69,32 @@ const AdminPanel = () => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleSubmitQuestion = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/admin/questions', newQuestion);
+      alert('Question added successfully!');
+      setNewQuestion({
+        exam: '',
+        topic: '',
+        question: '',
+        options: ['', '', '', ''],
+        correct: 0,
+        explanation: ''
+      });
+      fetchAdminData(); // Refresh data
+    } catch (error) {
+      console.error('Error adding question:', error);
+      alert('Failed to add question.');
+    }
+  };
+
+  const handleOptionChange = (index, value) => {
+    const updatedOptions = [...newQuestion.options];
+    updatedOptions[index] = value;
+    setNewQuestion({ ...newQuestion, options: updatedOptions });
   };
 
   if (loading) {
@@ -139,7 +177,7 @@ const AdminPanel = () => {
           {/* Tabs */}
           <div className="mb-6">
             <nav className="flex space-x-8">
-              {['overview', 'users', 'questions', 'attempts'].map((tab) => (
+              {['overview', 'users', 'questions', 'add-question', 'attempts'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -149,7 +187,7 @@ const AdminPanel = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === 'add-question' ? 'Add Question' : tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
               ))}
             </nav>
@@ -265,8 +303,8 @@ const AdminPanel = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Difficulty</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exam</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
                     </tr>
                   </thead>
@@ -274,8 +312,8 @@ const AdminPanel = () => {
                     {questions.map((question) => (
                       <tr key={question._id}>
                         <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">{question.question}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{question.category}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{question.difficulty}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{question.exam}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{question.topic}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(question.createdAt).toLocaleDateString()}</td>
                       </tr>
                     ))}
@@ -325,6 +363,93 @@ const AdminPanel = () => {
               </div>
             </motion.div>
           )}
+
+          {activeTab === 'add-question' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            >
+              <h3 className="text-lg font-medium text-gray-900 mb-6">Add New Question</h3>
+              <form onSubmit={handleSubmitQuestion} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Exam</label>
+                    <input
+                      type="text"
+                      value={newQuestion.exam}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, exam: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., ESIC, NORCET"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Topic</label>
+                    <input
+                      type="text"
+                      value={newQuestion.topic}
+                      onChange={(e) => setNewQuestion({ ...newQuestion, topic: e.target.value })}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., Anatomy, Nursing Fundamentals"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Question</label>
+                  <textarea
+                    value={newQuestion.question}
+                    onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    rows="3"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+                  {newQuestion.options.map((option, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                      <input
+                        type="radio"
+                        name="correct"
+                        value={index}
+                        checked={newQuestion.correct === index}
+                        onChange={(e) => setNewQuestion({ ...newQuestion, correct: parseInt(e.target.value) })}
+                        className="mr-2"
+                      />
+                      <input
+                        type="text"
+                        value={option}
+                        onChange={(e) => handleOptionChange(index, e.target.value)}
+                        className="flex-1 border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder={`Option ${index + 1}`}
+                        required
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Explanation</label>
+                  <textarea
+                    value={newQuestion.explanation}
+                    onChange={(e) => setNewQuestion({ ...newQuestion, explanation: e.target.value })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    rows="3"
+                    required
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Add Question
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </div>
@@ -332,3 +457,4 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
+import { useAuth } from '../context/AuthContext';

@@ -1,9 +1,13 @@
-# Add Question Key and Answer Key Feature TODO
+# Admin Dashboard Redesign Tasks
 
-## Plan Overview
-Add feature to add question key and answer key for exams through admin portal.
-
-## Steps
-- [ ] Update Question model to include questionKey field
-- [ ] Add Question Management section in AdminPanel with form to add questions
-- [ ] Test adding questions through admin portal
+- [ ] Analyze current AdminPanel.jsx structure and functionality
+- [ ] Design new layout with sidebar navigation
+- [ ] Implement modern stats cards with improved styling
+- [ ] Redesign overview tab with better charts and recent activity
+- [ ] Update users tab with enhanced table design
+- [ ] Update questions tab with improved table
+- [ ] Update attempts tab with better table
+- [ ] Redesign add-question form with modern UI
+- [ ] Ensure responsive design across all components
+- [ ] Test all functionality remains intact
+- [ ] Final review and cleanup
