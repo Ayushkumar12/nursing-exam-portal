@@ -313,7 +313,7 @@ const Result = () => {
                 <div className="p-8 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-[2rem] text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-bl-full"></div>
                   <Award className="mb-4 opacity-50" size={32} />
-                  <p className="text-lg font-black mb-2 tracking-tight">Specialization Path</p>
+                  <p className="text-lg font-black mb-2 tracking-tight">Specializationk Path</p>
                   <p className="text-sm font-medium text-indigo-100 leading-relaxed">
                     Analyzing your response patterns... You show high proficiency in Acute Care logic. Consider focusing on Cardiovascular modules.
                   </p>
