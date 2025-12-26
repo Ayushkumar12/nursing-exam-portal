@@ -68,4 +68,63 @@ router.post('/questions', auth, adminAuth, async (req, res) => {
   }
 });
 
+// Get admin stats
+router.get('/stats', auth, adminAuth, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalQuestions = await Question.countDocuments();
+    const totalAttempts = await Attempt.countDocuments();
+    const attempts = await Attempt.find();
+    const averageScore = attempts.length > 0
+      ? attempts.reduce((sum, a) => sum + (a.score / a.totalQuestions * 100), 0) / attempts.length
+      : 0;
+
+    res.send({
+      totalUsers,
+      totalQuestions,
+      totalAttempts,
+      averageScore: averageScore.toFixed(2)
+    });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Get all users
+router.get('/users', auth, adminAuth, async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.send(users);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Get all questions
+router.get('/questions', auth, adminAuth, async (req, res) => {
+  try {
+    const questions = await Question.find();
+    res.send(questions);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Get all attempts
+router.get('/attempts', auth, adminAuth, async (req, res) => {
+  try {
+    const attempts = await Attempt.find().populate('user', 'name email');
+    const formattedAttempts = attempts.map(attempt => ({
+      _id: attempt._id,
+      userName: attempt.user.name,
+      score: (attempt.score / attempt.totalQuestions * 100).toFixed(2),
+      questionsAnswered: attempt.totalQuestions,
+      date: attempt.date
+    }));
+    res.send(formattedAttempts);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
 module.exports = router;
