@@ -264,7 +264,7 @@ const Result = () => {
                     <Stack direction="row" spacing={3} justifyContent={{ xs: 'center', md: 'flex-start' }}>
                       <Paper sx={{ p: 2, textAlign: 'center', minWidth: 100 }}>
                         <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary' }}>
-                          Affirmative
+                          Correct
                         </Typography>
                         <Typography variant="h4" sx={{ color: green[600], fontWeight: 'bold' }}>
                           {attempt.score}
@@ -272,10 +272,10 @@ const Result = () => {
                       </Paper>
                       <Paper sx={{ p: 2, textAlign: 'center', minWidth: 100 }}>
                         <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary' }}>
-                          Total Logic
+                          Incorrect
                         </Typography>
-                        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                          {attempt.totalQuestions}
+                        <Typography variant="h4" sx={{ color: red[600], fontWeight: 'bold' }}>
+                          {attempt.totalQuestions - attempt.score}
                         </Typography>
                       </Paper>
                     </Stack>

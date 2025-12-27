@@ -4,13 +4,24 @@ const Question = require('../models/Question');
 const Attempt = require('../models/Attempt');
 const { auth } = require('../middleware/authMiddleware');
 
-// Get 100 random questions for an exam
+// Get 100 questions for an exam: 20 from each topic
 router.get('/generate/:exam', auth, async (req, res) => {
   try {
     const { exam } = req.params;
     const questions = await Question.aggregate([
       { $match: { exam } },
-      { $sample: { size: 100 } }
+      { $group: { _id: "$topic", questions: { $push: "$$ROOT" } } },
+      { $project: {
+        questions: {
+          $function: {
+            body: function(arr) { return arr.sort(() => Math.random() - 0.5).slice(0, 20); },
+            args: ["$questions"],
+            lang: "js"
+          }
+        }
+      } },
+      { $unwind: "$questions" },
+      { $replaceRoot: { newRoot: "$questions" } }
     ]);
     res.send(questions);
   } catch (error) {

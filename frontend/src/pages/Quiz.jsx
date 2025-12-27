@@ -343,9 +343,14 @@ const Quiz = () => {
                   >
                     {currentIndex + 1}
                   </Paper>
-                  <Typography variant="h5" component="h2" sx={{ flex: 1, fontWeight: 600, fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-                    {currentQ.question}
-                  </Typography>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                      Topic: {currentQ.topic}
+                    </Typography>
+                    <Typography variant="h5" component="h2" sx={{ fontWeight: 600, fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+                      {currentQ.question}
+                    </Typography>
+                  </Box>
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

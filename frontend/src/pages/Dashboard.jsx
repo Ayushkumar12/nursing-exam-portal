@@ -294,6 +294,14 @@ const Dashboard = () => {
               >
                 Certificates
               </Button>
+              <Button
+                fullWidth
+                startIcon={<Logout />}
+                onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                sx={{ justifyContent: 'flex-start', mb: 1, color: 'error.main' }}
+              >
+                Logout
+              </Button>
             </Box>
           </Box>
         )}

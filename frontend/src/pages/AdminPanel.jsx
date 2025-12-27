@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Area, AreaChart
@@ -15,6 +17,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 const AdminPanel = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const [stats, setStats] = useState({ totalUsers: 0, totalQuestions: 0, totalAttempts: 0, averageScore: 0 });
   const [users, setUsers] = useState([]);
@@ -27,6 +31,11 @@ const AdminPanel = () => {
   const [newQuestion, setNewQuestion] = useState({ exam: '', topic: '', question: '', options: ['', '', '', ''], correct: 0, explanation: '' });
 
   useEffect(() => { fetchAdminData(); }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const fetchAdminData = async () => {
     try {
@@ -140,7 +149,7 @@ const AdminPanel = () => {
               variant="outlined"
               color="error"
               startIcon={<Logout />}
-              onClick={() => {/* handle logout */}}
+              onClick={handleLogout}
               sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
             >
               Logout
@@ -175,6 +184,14 @@ const AdminPanel = () => {
                   {item.name}
                 </Button>
               ))}
+              <Button
+                fullWidth
+                startIcon={<Logout />}
+                onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                sx={{ justifyContent: 'flex-start', mb: 1, color: 'error.main' }}
+              >
+                Logout
+              </Button>
             </Box>
           </Box>
         )}
