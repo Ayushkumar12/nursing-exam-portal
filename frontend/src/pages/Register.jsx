@@ -1,8 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, Mail, Lock, User, AlertCircle, Stethoscope } from 'lucide-react';
-import { motion } from 'framer-motion';
+import {
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  Avatar,
+  Grid,
+  Link as MuiLink,
+  CircularProgress,
+  InputAdornment,
+  IconButton
+} from '@mui/material';
+import {
+  Email,
+  Lock,
+  Person,
+  PersonAdd,
+  LocalHospital,
+  Visibility,
+  VisibilityOff
+} from '@mui/icons-material';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -10,6 +32,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -27,159 +50,221 @@ const Register = () => {
     }
   };
 
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen p-6 bg-slate-50 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-sky-50/50 rounded-full blur-3xl"></div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-lg z-10"
-      >
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center justify-center w-24 h-24 rounded-[2.5rem] bg-white text-indigo-600 mb-8 shadow-2xl shadow-indigo-100 rotate-3 border border-indigo-50"
-          >
-            <Stethoscope size={48} strokeWidth={1.5} />
-          </motion.div>
-          <motion.h1
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl font-extrabold tracking-tight mb-4 text-slate-900"
-          >
-            Nurse<span className="text-indigo-600">Hub</span>
-          </motion.h1>
-          <motion.p
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-slate-500 text-xl font-medium"
-          >
-            Start your journey to nursing excellence
-          </motion.p>
-        </div>
-
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="glass-panel p-12 md:p-16 bg-white/80 backdrop-blur-2xl"
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        p: 2
+      }}
+    >
+      <Container maxWidth="sm">
+        <Paper
+          elevation={24}
+          sx={{
+            p: { xs: 2, sm: 4 },
+            borderRadius: 3,
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }}
         >
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Create Account</h2>
-            <p className="text-slate-500 font-medium">Join thousands of nursing students</p>
-          </div>
-
-          {error && (
-            <motion.div
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="flex items-center gap-4 p-5 mb-8 rounded-2xl bg-rose-50 text-rose-600 border border-rose-100 shadow-sm"
+          {/* Header Section */}
+          <Box textAlign="center" mb={4}>
+            <Avatar
+              sx={{
+                width: { xs: 60, sm: 80 },
+                height: { xs: 60, sm: 80 },
+                bgcolor: 'secondary.main',
+                mx: 'auto',
+                mb: 2,
+                boxShadow: 3
+              }}
             >
-              <div className="w-10 h-10 rounded-xl bg-white flex-center shadow-sm">
-                <AlertCircle size={22} />
-              </div>
-              <span className="text-sm font-bold">{error}</span>
-            </motion.div>
-          )}
+              <LocalHospital sx={{ fontSize: { xs: 30, sm: 40 } }} />
+            </Avatar>
+            <Typography
+              variant="h3"
+              component="h1"
+              sx={{
+                fontSize: { xs: '2rem', sm: '3rem' },
+                fontWeight: 'bold',
+                mb: 1,
+                background: 'linear-gradient(45deg, #FF4081 30%, #FF9800 90%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              NurseHub
+            </Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+              Join the Nursing Community
+            </Typography>
+          </Box>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-widest">Full Name</label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
-                  <User size={22} />
-                </div>
-                <input
+          {/* Register Form */}
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold', mb: 3, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
+              Create Your Account
+            </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Full Name"
                   type="text"
-                  placeholder="John Doe"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-5 pl-14 pr-6 focus:bg-white focus:border-indigo-600 transition-all outline-none font-medium text-slate-800"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
                 />
-              </div>
-            </div>
+              </Grid>
 
-            <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-widest">Email Address</label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
-                  <Mail size={22} />
-                </div>
-                <input
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Email Address"
                   type="email"
-                  placeholder="name@example.com"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-5 pl-14 pr-6 focus:bg-white focus:border-indigo-600 transition-all outline-none font-medium text-slate-800"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
                 />
-              </div>
-            </div>
+              </Grid>
 
-            <div className="space-y-3">
-              <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-widest">Password</label>
-              <div className="relative group">
-                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
-                  <Lock size={22} />
-                </div>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-5 pl-14 pr-6 focus:bg-white focus:border-indigo-600 transition-all outline-none font-medium text-slate-800"
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock color="action" />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 2,
+                    }
+                  }}
                 />
-              </div>
-            </div>
+              </Grid>
 
-            <button
-              type="submit"
-              className="btn-primary w-full py-5 text-lg mt-4 disabled:opacity-70 disabled:cursor-not-allowed group !rounded-2xl"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                <>
-                  <span className="font-bold">Create Professional Account</span>
-                  <UserPlus size={22} className="group-hover:-translate-y-0.5 transition-transform" />
-                </>
-              )}
-            </button>
-          </form>
+              <Grid item xs={12}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  disabled={isSubmitting}
+                  startIcon={isSubmitting ? <CircularProgress size={20} /> : <PersonAdd />}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: 2,
+                    fontWeight: 'bold',
+                    textTransform: 'none',
+                    background: 'linear-gradient(45deg, #FF4081 30%, #FF9800 90%)',
+                    boxShadow: '0 3px 5px 2px rgba(255, 64, 129, .3)',
+                    '&:hover': {
+                      background: 'linear-gradient(45deg, #F50057 30%, #FF5722 90%)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 10px 2px rgba(255, 64, 129, .3)',
+                    },
+                    transition: 'all 0.3s ease-in-out'
+                  }}
+                >
+                  {isSubmitting ? 'Creating Account...' : 'Create Professional Account'}
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
 
-          <div className="mt-12 text-center">
-            <p className="text-slate-500 font-medium">
+          {/* Footer Links */}
+          <Box textAlign="center" mt={4}>
+            <Typography variant="body2" color="text.secondary">
               Already have an account?{' '}
-              <Link to="/login" className="font-extrabold text-indigo-600 hover:text-indigo-700 underline-offset-8 hover:underline transition-all">
+              <MuiLink
+                component={Link}
+                to="/login"
+                sx={{
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  color: 'secondary.main',
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
                 Sign In Instead
-              </Link>
-            </p>
-          </div>
-        </motion.div>
+              </MuiLink>
+            </Typography>
+          </Box>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-12 text-center"
-        >
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">
-            © 2025 NurseHub Corporation • Enterprise Grade Security
-          </p>
-        </motion.div>
-      </motion.div>
-    </div>
+          {/* Footer */}
+          <Box textAlign="center" mt={4} pt={2} borderTop={1} borderColor="divider">
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>
+              © 2025 NurseHub Corporation • Enterprise Grade Security
+            </Typography>
+          </Box>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 

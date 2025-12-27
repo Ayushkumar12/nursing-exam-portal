@@ -37,8 +37,8 @@ const PageWrapper = ({ children }) => (
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="App">
           <AnimatePresence mode="wait">
             <Routes>
@@ -53,8 +53,8 @@ function App() {
             </Routes>
           </AnimatePresence>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 

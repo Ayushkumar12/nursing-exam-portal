@@ -1,7 +1,89 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { Loader2, ChevronLeft, ChevronRight, CheckCircle2, Timer, AlertCircle } from 'lucide-react';
+import {
+  ThemeProvider,
+  createTheme,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  LinearProgress,
+  Box,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Alert,
+  Paper,
+  Grid,
+  Fade,
+  Slide,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
+import {
+  ArrowBack,
+  ArrowForward,
+  CheckCircle,
+  Timer,
+  Error,
+  Psychology,
+  TrendingUp,
+  PlayArrow,
+  Pause,
+  Close,
+} from '@mui/icons-material';
+import { green, blue, red, orange } from '@mui/material/colors';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: blue[600],
+    },
+    secondary: {
+      main: green[600],
+    },
+    error: {
+      main: red[600],
+    },
+    warning: {
+      main: orange[600],
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h4: {
+      fontWeight: 700,
+    },
+    h6: {
+      fontWeight: 600,
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          textTransform: 'none',
+          fontWeight: 600,
+        },
+      },
+    },
+  },
+});
 
 const Quiz = () => {
   const { exam } = useParams();
@@ -9,8 +91,9 @@ const Quiz = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes default
+  const [timeLeft, setTimeLeft] = useState(3000);
   const [error, setError] = useState(null);
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,25 +103,21 @@ const Quiz = () => {
         if (!data || data.length === 0) {
           setError("No questions available for this exam yet.");
         } else {
-          // Shuffle options for each question
           const shuffledQuestions = data.map(q => {
             const originalOptions = [...q.options];
             const shuffledOptions = [...q.options];
             const mapping = [];
 
-            // Fisher-Yates shuffle
             for (let i = shuffledOptions.length - 1; i > 0; i--) {
               const j = Math.floor(Math.random() * (i + 1));
               [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
             }
 
-            // Create mapping from shuffled index to original index
             shuffledOptions.forEach((option, idx) => {
               const originalIdx = originalOptions.indexOf(option);
               mapping[idx] = originalIdx;
             });
 
-            // Update correct index to match shuffled position
             const newCorrect = mapping.indexOf(q.correct);
 
             return {
@@ -100,142 +179,281 @@ const Quiz = () => {
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-      <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
-        <Loader2 className="text-indigo-600 animate-spin" size={32} />
-      </div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-2">Loading Quiz</h2>
-      <p className="text-slate-600 text-center">Preparing your {exam} assessment...</p>
-    </div>
-  );
+  const handleExitClick = () => {
+    setExitDialogOpen(true);
+  };
 
-  if (error) return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-      <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-        <AlertCircle className="text-red-600" size={32} />
-      </div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-2">Error</h2>
-      <p className="text-slate-600 text-center mb-6">{error}</p>
-      <button
-        onClick={() => navigate('/dashboard')}
-        className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium"
-      >
-        Back to Dashboard
-      </button>
-    </div>
-  );
+  const handleExitConfirm = () => {
+    setExitDialogOpen(false);
+    navigate('/dashboard');
+  };
+
+  if (loading) {
+    return (
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'grey.50',
+            p: 3,
+          }}
+        >
+          <Fade in={true} timeout={1000}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Psychology sx={{ fontSize: 80, color: 'primary.main', mb: 3 }} />
+              <Typography variant="h4" gutterBottom>
+                Preparing Your Quiz
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                Loading {exam} assessment questions...
+              </Typography>
+              <CircularProgress size={60} thickness={4} />
+            </Box>
+          </Fade>
+        </Box>
+      </ThemeProvider>
+    );
+  }
+
+  if (error) {
+    return (
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'grey.50',
+            p: 3,
+          }}
+        >
+          <Alert severity="error" sx={{ mb: 3, maxWidth: 400 }}>
+            <Typography variant="h6" gutterBottom>
+              Error Loading Quiz
+            </Typography>
+            <Typography variant="body2">{error}</Typography>
+          </Alert>
+          <Button variant="contained" onClick={() => navigate('/dashboard')}>
+            Back to Dashboard
+          </Button>
+        </Box>
+      </ThemeProvider>
+    );
+  }
 
   const currentQ = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const isTimeLow = timeLeft < 60;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Mobile-first Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => {
-              if (window.confirm("Are you sure you want to exit? Your progress may be lost.")) {
-                navigate('/dashboard');
-              }
-            }}
-            className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600"
-          >
-            <ChevronLeft size={20} />
-          </button>
-
-          <div className="flex items-center gap-2">
-            <Timer size={20} className={isTimeLow ? 'text-red-500' : 'text-indigo-600'} />
-            <span className={`font-mono text-lg ${isTimeLow ? 'text-red-500' : 'text-slate-900'}`}>
-              {formatTime(timeLeft)}
-            </span>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mt-4">
-          <div className="flex justify-between text-sm text-slate-600 mb-2">
-            <span>Question {currentIndex + 1} of {questions.length}</span>
-            <span>{Math.round(progress)}%</span>
-          </div>
-          <div className="w-full bg-slate-200 rounded-full h-2">
-            <div
-              className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="px-4 py-6">
-        {/* Question */}
-        <div className="bg-white rounded-xl p-6 mb-6 shadow-sm border border-slate-200">
-          <h2 className="text-xl font-semibold text-slate-900 mb-6 leading-relaxed">
-            {currentQ.question}
-          </h2>
-
-          {/* Options */}
-          <div className="space-y-3">
-            {currentQ.options.map((option, idx) => {
-              const isSelected = responses[currentIndex] === idx;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleOptionSelect(idx)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                    isSelected
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-900'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                  }`}
+    <ThemeProvider theme={theme}>
+      <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50' }}>
+        {/* Header */}
+        <Paper
+          elevation={2}
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 1100,
+            borderRadius: 0,
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
+        >
+          <Container maxWidth="lg">
+            <Box sx={{ py: { xs: 1, sm: 2 } }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
+                <IconButton
+                  onClick={handleExitClick}
+                  sx={{
+                    bgcolor: 'grey.100',
+                    '&:hover': { bgcolor: 'grey.200' },
+                    p: { xs: 0.5, sm: 1 }
+                  }}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'
-                    }`}>
-                      {isSelected && <CheckCircle2 size={14} className="text-white" />}
-                    </div>
-                    <span className="text-base leading-relaxed">{option}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                  <ArrowBack />
+                </IconButton>
+                <Chip
+                  icon={<Timer />}
+                  label={formatTime(timeLeft)}
+                  color={isTimeLow ? 'error' : 'primary'}
+                  variant="outlined"
+                  sx={{
+                    fontWeight: 'bold',
+                    fontSize: { xs: '0.9rem', sm: '1.1rem' },
+                    px: { xs: 1, sm: 2 },
+                    py: 1,
+                  }}
+                />
+              </Box>
 
-        {/* Navigation */}
-        <div className="flex gap-3">
-          <button
-            disabled={currentIndex === 0}
-            onClick={() => setCurrentIndex(currentIndex - 1)}
-            className="flex-1 bg-white border border-slate-200 text-slate-700 py-3 px-4 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft size={20} className="inline mr-2" />
-            Previous
-          </button>
+              <Box sx={{ mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Question {currentIndex + 1} of {questions.length}
+                  </Typography>
+                  <Typography variant="body2" color="primary" fontWeight="bold">
+                    {Math.round(progress)}%
+                  </Typography>
+                </Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={progress}
+                  sx={{
+                    height: 8,
+                    borderRadius: 4,
+                    bgcolor: 'grey.200',
+                    '& .MuiLinearProgress-bar': {
+                      bgcolor: 'primary.main',
+                      borderRadius: 4,
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+          </Container>
+        </Paper>
 
-          {currentIndex === questions.length - 1 ? (
-            <button
-              onClick={handleSubmit}
-              className="flex-1 bg-emerald-600 text-white py-3 px-4 rounded-lg font-medium"
+        {/* Main Content */}
+        <Container maxWidth="md" sx={{ py: 4 }}>
+          <Fade in={true} timeout={500}>
+            <Card sx={{ mb: 4 }}>
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: 'primary.main',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      fontSize: '1.2rem',
+                      borderRadius: 2,
+                    }}
+                  >
+                    {currentIndex + 1}
+                  </Paper>
+                  <Typography variant="h5" component="h2" sx={{ flex: 1, fontWeight: 600, fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+                    {currentQ.question}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {currentQ.options.map((option, idx) => {
+                    const isSelected = responses[currentIndex] === idx;
+                    const optionLetters = ['A', 'B', 'C', 'D'];
+
+                    return (
+                      <Button
+                        key={idx}
+                        variant={isSelected ? 'contained' : 'outlined'}
+                        onClick={() => handleOptionSelect(idx)}
+                        sx={{
+                          justifyContent: 'flex-start',
+                          p: { xs: 2, sm: 3 },
+                          textAlign: 'left',
+                          borderRadius: 3,
+                          textTransform: 'none',
+                          fontSize: { xs: '0.9rem', sm: '1rem' },
+                          fontWeight: 500,
+                          minHeight: 60,
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: 3,
+                          },
+                          transition: 'all 0.2s ease-in-out',
+                        }}
+                        startIcon={
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: 2,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              bgcolor: isSelected ? 'white' : 'transparent',
+                              color: isSelected ? 'primary.main' : 'text.secondary',
+                              fontWeight: 'bold',
+                              fontSize: '0.9rem',
+                              border: isSelected ? 0 : 1,
+                              borderColor: 'divider',
+                            }}
+                          >
+                            {isSelected ? <CheckCircle /> : optionLetters[idx]}
+                          </Box>
+                        }
+                      >
+                        {option}
+                      </Button>
+                    );
+                  })}
+                </Box>
+              </CardContent>
+            </Card>
+          </Fade>
+
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="outlined"
+              disabled={currentIndex === 0}
+              onClick={() => setCurrentIndex(currentIndex - 1)}
+              startIcon={<ArrowBack />}
+              sx={{ flex: 1, py: 2 }}
             >
-              Submit Quiz
-              <CheckCircle2 size={20} className="inline ml-2" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setCurrentIndex(currentIndex + 1)}
-              className="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium"
-            >
-              Next
-              <ChevronRight size={20} className="inline ml-2" />
-            </button>
-          )}
-        </div>
-      </main>
-    </div>
+              Previous
+            </Button>
+
+            {currentIndex === questions.length - 1 ? (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleSubmit}
+                endIcon={<CheckCircle />}
+                sx={{ flex: 1, py: 2 }}
+              >
+                Submit Quiz
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={() => setCurrentIndex(currentIndex + 1)}
+                endIcon={<ArrowForward />}
+                sx={{ flex: 1, py: 2 }}
+              >
+                Next
+              </Button>
+            )}
+          </Box>
+        </Container>
+
+        {/* Exit Confirmation Dialog */}
+        <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
+          <DialogTitle>Exit Quiz?</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to exit? Your progress may be lost.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setExitDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleExitConfirm} color="error">
+              Exit
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </ThemeProvider>
   );
 };
 
