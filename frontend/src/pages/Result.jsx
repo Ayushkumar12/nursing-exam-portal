@@ -131,7 +131,7 @@ const Result = () => {
     );
   }
 
-  const { attempt, questions } = state;
+  const { attempt, questions, gameMode, gameStats } = state;
   const percentage = (attempt.score / attempt.totalQuestions) * 100;
 
   const chartData = [
@@ -283,6 +283,59 @@ const Result = () => {
                 </Card>
               </Fade>
 
+              {/* Game Stats (if game mode) */}
+              {gameMode && gameStats && (
+                <Fade in={true} timeout={1200}>
+                  <Card sx={{ p: { xs: 2, sm: 4 }, mb: 4, bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                      🎮 Game Mode Results
+                    </Typography>
+                    <Grid container spacing={3} sx={{ mt: 2 }}>
+                      <Grid item xs={6} sm={3}>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                            {gameStats.points}
+                          </Typography>
+                          <Typography variant="body2" sx={{ opacity: 0.8 }} style={{ color: 'black' }}>
+                            Total Points
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                            {gameStats.level}
+                          </Typography>
+                          <Typography variant="body2" sx={{ opacity: 0.8 }} style={{ color: 'black' }}>
+                            Level Reached
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                            {gameStats.streak}
+                          </Typography>
+                          <Typography variant="body2" sx={{ opacity: 0.8 }} style={{ color: 'black' }}>
+                            Best Streak
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                            {attempt.score}
+                          </Typography>
+                          <Typography variant="body2" sx={{ opacity: 0.8 }} style={{ color: 'black' }}>
+                            Correct Answers
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Card>
+                </Fade>
+              )}
+
               {/* Question Analysis */}
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
                 Rationale Analysis
@@ -395,9 +448,9 @@ const Result = () => {
                     variant="contained"
                     fullWidth
                     startIcon={<Replay />}
-                    onClick={() => navigate(`/quiz/${attempt.exam}`)}
+                    onClick={() => navigate(gameMode ? `/game-quiz/${attempt.exam}` : `/quiz/${attempt.exam}`)}
                   >
-                    Restart Assessment
+                    {gameMode ? 'Play Again' : 'Restart Assessment'}
                   </Button>
                   <Button
                     variant="outlined"

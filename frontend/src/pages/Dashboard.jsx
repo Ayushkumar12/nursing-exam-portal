@@ -115,8 +115,13 @@ const Dashboard = () => {
         const { data } = await api.get('/quiz/history');
         setHistory(data);
       } catch (err) {
-        console.error(err);
-        setError('Failed to load quiz history. Please try again later.');
+        if (err.response && err.response.status === 401) {
+          logout();
+          navigate('/login');
+        } else {
+          console.error(err);
+          setError('Failed to load quiz history. Please try again later.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -409,32 +414,61 @@ const Dashboard = () => {
                       <Grid container spacing={2}>
                         {exams.map((exam, index) => (
                           <Grid item xs={12} sm={6} key={index}>
-                            <Button
-                              fullWidth
-                              variant="outlined"
-                              onClick={() => navigate(`/quiz/${exam}`)}
-                              sx={{
-                                p: { xs: 2, md: 3 },
-                                justifyContent: 'flex-start',
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                '&:hover': { bgcolor: 'primary.light', color: 'white' },
-                              }}
-                              startIcon={
-                                <Avatar sx={{ bgcolor: 'primary.main', width: { xs: 32, md: 40 }, height: { xs: 32, md: 40 } }}>
-                                  {exam.charAt(0)}
-                                </Avatar>
-                              }
-                            >
-                              <Box sx={{ textAlign: 'left' }}>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: { xs: '0.875rem', md: '1rem' } }}>
-                                  {exam}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
-                                  Start Practice
-                                </Typography>
-                              </Box>
-                            </Button>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                              <Button
+                                fullWidth
+                                variant="outlined"
+                                onClick={() => navigate(`/quiz/${exam}`)}
+                                sx={{
+                                  p: { xs: 2, md: 3 },
+                                  justifyContent: 'flex-start',
+                                  borderRadius: 2,
+                                  textTransform: 'none',
+                                  '&:hover': { bgcolor: 'primary.light', color: 'white' },
+                                }}
+                                startIcon={
+                                  <Avatar sx={{ bgcolor: 'primary.main', width: { xs: 32, md: 40 }, height: { xs: 32, md: 40 } }}>
+                                    {exam.charAt(0)}
+                                  </Avatar>
+                                }
+                              >
+                                <Box sx={{ textAlign: 'left' }}>
+                                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: { xs: '0.875rem', md: '1rem' } }}>
+                                    {exam}
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
+                                    Start Practice
+                                  </Typography>
+                                </Box>
+                              </Button>
+                              <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={() => navigate(`/game-quiz/${exam}`)}
+                                sx={{
+                                  p: { xs: 1.5, md: 2.5 },
+                                  justifyContent: 'flex-start',
+                                  borderRadius: 2,
+                                  textTransform: 'none',
+                                  bgcolor: 'secondary.main',
+                                  '&:hover': { bgcolor: 'secondary.dark' },
+                                }}
+                                startIcon={
+                                  <Avatar sx={{ bgcolor: 'secondary.dark', width: { xs: 28, md: 36 }, height: { xs: 28, md: 36 } }}>
+                                    <EmojiEvents fontSize="small" />
+                                  </Avatar>
+                                }
+                              >
+                                <Box sx={{ textAlign: 'left' }}>
+                                  <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
+                                    Game Mode
+                                  </Typography>
+                                  <Typography variant="caption" color="rgba(255,255,255,0.8)" sx={{ fontSize: { xs: '0.6rem', md: '0.7rem' } }}>
+                                    Fun & Points
+                                  </Typography>
+                                </Box>
+                              </Button>
+                            </Box>
                           </Grid>
                         ))}
                       </Grid>

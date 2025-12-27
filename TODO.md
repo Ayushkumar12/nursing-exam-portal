@@ -1,4 +1,1 @@
-- [x] Modify backend/routes/quiz.js to select 20 questions per topic for quiz generation
-- [x] Update frontend/src/pages/Quiz.jsx to display topic in question heading
-- [x] Test the quiz generation endpoint (server starts successfully)
-- [x] Test the frontend display (changes applied)
+# TODO

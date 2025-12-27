@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
           await user.save();
         }
       }
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
       // Remove password from response
       const userResponse = user.toObject();
       delete userResponse.password;
@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).send({ error: 'Invalid login credentials' });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     // Remove password from response
     const userResponse = user.toObject();
     delete userResponse.password;

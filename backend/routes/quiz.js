@@ -8,23 +8,30 @@ const { auth } = require('../middleware/authMiddleware');
 router.get('/generate/:exam', auth, async (req, res) => {
   try {
     const { exam } = req.params;
-    const questions = await Question.aggregate([
-      { $match: { exam } },
-      { $group: { _id: "$topic", questions: { $push: "$$ROOT" } } },
-      { $project: {
-        questions: {
-          $function: {
-            body: function(arr) { return arr.sort(() => Math.random() - 0.5).slice(0, 20); },
-            args: ["$questions"],
-            lang: "js"
-          }
-        }
-      } },
-      { $unwind: "$questions" },
-      { $replaceRoot: { newRoot: "$questions" } }
-    ]);
-    res.send(questions);
+
+    // Get all topics for the exam
+    const topics = await Question.distinct('topic', { exam });
+
+    let allQuestions = [];
+
+    for (const topic of topics) {
+      // Get up to 20 random questions per topic
+      const topicQuestions = await Question.aggregate([
+        { $match: { exam, topic } },
+        { $sample: { size: 20 } }
+      ]);
+      allQuestions = allQuestions.concat(topicQuestions);
+    }
+
+    // If we have more than 100 questions, randomly select 100
+    if (allQuestions.length > 100) {
+      const shuffled = allQuestions.sort(() => Math.random() - 0.5);
+      allQuestions = shuffled.slice(0, 100);
+    }
+
+    res.send(allQuestions);
   } catch (error) {
+    console.error('Error generating questions:', error);
     res.status(500).send({ error: error.message });
   }
 });

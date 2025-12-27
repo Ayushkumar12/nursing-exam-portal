@@ -31,6 +31,7 @@
     "mongoose": "^9.0.2",
     "nodemon": "^3.0.0",
     "react": "^19.2.3",
+    "react-confetti": "^6.4.0",
     "react-dom": "^19.2.3",
     "react-router-dom": "^7.11.0",
     "recharts": "^3.6.0",
