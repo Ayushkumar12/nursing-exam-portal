@@ -107,7 +107,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const exams = ["ESIC", "RRB", "NORCET", "NHM", "CHO", "UPPSC", "KGMU", "SGPGI", "MNS"];
+  const exams = ["ESIC", "RRB Nursing", "NORCET", "NHM", "CHO", "UPPSC", "KGMU", "SGPGI", "MNS"];
 
   useEffect(() => {
     const fetchHistory = async () => {
