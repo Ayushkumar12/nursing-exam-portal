@@ -24,6 +24,7 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [attempts, setAttempts] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [anchorEl, setAnchorEl] = useState(null);
@@ -40,13 +41,14 @@ const AdminPanel = () => {
   const fetchAdminData = async () => {
     try {
       setLoading(true);
-      const [statsRes, usersRes, questionsRes, attemptsRes] = await Promise.all([
-        api.get('/admin/stats'), api.get('/admin/users'), api.get('/admin/questions'), api.get('/admin/attempts')
+      const [statsRes, usersRes, questionsRes, attemptsRes, activitiesRes] = await Promise.all([
+        api.get('/admin/stats'), api.get('/admin/users'), api.get('/admin/questions'), api.get('/admin/attempts'), api.get('/admin/activities')
       ]);
       setStats(statsRes.data);
       setUsers(usersRes.data);
       setQuestions(questionsRes.data);
       setAttempts(attemptsRes.data);
+      setActivities(activitiesRes.data);
     } catch (error) {
       console.error('Error fetching admin data:', error);
     } finally {
@@ -98,6 +100,7 @@ const AdminPanel = () => {
     { id: 'users', name: 'Users', icon: <UsersIcon /> },
     { id: 'questions', name: 'Questions', icon: <FileTextIcon /> },
     { id: 'attempts', name: 'Attempts', icon: <TrendingUpIcon /> },
+    { id: 'activities', name: 'Activities', icon: <ActivityIcon /> },
     { id: 'add-question', name: 'Add Question', icon: <PlusCircleIcon /> },
   ];
 
@@ -140,7 +143,7 @@ const AdminPanel = () => {
             }}
           >
             {navigationItems.map((item) => (
-              <Tab key={item.id} icon={item.icon} label={item.name} />
+              <Tab key={item.id} icon={item.icon} label={item.name} value={item.id} />
             ))}
           </Tabs>
 
@@ -371,6 +374,44 @@ const AdminPanel = () => {
                       slots={{ toolbar: GridToolbar }} pageSizeOptions={[10, 25, 50]} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} disableRowSelectionOnClick sx={{ border: 'none' }}
                     />
                     </Box>
+                  </Box>
+                </Card>
+              </motion.div>
+            )}
+
+            {activeTab === 'activities' && (
+              <motion.div key="activities" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <Card sx={{ borderRadius: 4 }}>
+                  <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="h6" fontWeight={700}>Student Activity Log</Typography>
+                    <Button startIcon={<Download />} onClick={() => exportData(activities, 'activities.json')}>Export Log</Button>
+                  </Box>
+                  <Box sx={{ height: 600, width: '100%' }}>
+                    <DataGrid
+                      rows={activities.map((a, i) => ({ ...a, id: a._id || i }))}
+                      columns={[
+                        { field: 'date', headerName: 'Timestamp', flex: 1, valueFormatter: (value) => new Date(value).toLocaleString() },
+                        { field: 'userName', headerName: 'User', flex: 1, renderCell: (params) => params.row.user?.name || 'System' },
+                        { field: 'email', headerName: 'Email', flex: 1, renderCell: (params) => params.row.user?.email || '-' },
+                        { field: 'action', headerName: 'Action', flex: 0.8, renderCell: (params) => (
+                          <Chip 
+                            label={params.value} 
+                            size="small" 
+                            color={
+                              params.value.includes('LOGIN') ? 'info' : 
+                              params.value.includes('QUIZ_COMPLETED') ? 'success' : 
+                              params.value.includes('QUIZ_STARTED') ? 'warning' : 'default'
+                            } 
+                            sx={{ fontWeight: 600 }}
+                          />
+                        )},
+                        { field: 'details', headerName: 'Details', flex: 1.5 },
+                      ]}
+                      pageSizeOptions={[10, 25, 50]}
+                      initialState={{ pagination: { paginationModel: { pageSize: 10 } } }}
+                      disableRowSelectionOnClick
+                      sx={{ border: 'none' }}
+                    />
                   </Box>
                 </Card>
               </motion.div>

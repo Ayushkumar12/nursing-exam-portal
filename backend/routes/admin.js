@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Attempt = require('../models/Attempt');
 const Question = require('../models/Question');
+const Activity = require('../models/Activity');
 const { auth, adminAuth } = require('../middleware/authMiddleware');
 
 // Get all students with their stats
@@ -122,6 +123,19 @@ router.get('/attempts', auth, adminAuth, async (req, res) => {
       date: attempt.date
     }));
     res.send(formattedAttempts);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Get all activities
+router.get('/activities', auth, adminAuth, async (req, res) => {
+  try {
+    const activities = await Activity.find()
+      .populate('user', 'name email')
+      .sort({ date: -1 })
+      .limit(100);
+    res.send(activities);
   } catch (error) {
     res.status(500).send({ error: error.message });
   }

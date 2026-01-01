@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Question = require('../models/Question');
 const Attempt = require('../models/Attempt');
+const { logActivity } = require('../utils/logger');
 const { auth } = require('../middleware/authMiddleware');
 
 // Get 100 questions for an exam: 20 from each topic
@@ -29,6 +30,7 @@ router.get('/generate/:exam', auth, async (req, res) => {
       allQuestions = shuffled.slice(0, 100);
     }
 
+    await logActivity(req.user._id, 'QUIZ_STARTED', `Started quiz: ${exam}`);
     res.send(allQuestions);
   } catch (error) {
     console.error('Error generating questions:', error);
@@ -65,6 +67,7 @@ router.post('/submit', auth, async (req, res) => {
     });
 
     await attempt.save();
+    await logActivity(req.user._id, 'QUIZ_COMPLETED', `Completed quiz: ${exam}. Score: ${score}/${responses.length}`);
     res.status(201).send(attempt);
   } catch (error) {
     res.status(400).send({ error: error.message });

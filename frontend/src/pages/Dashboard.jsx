@@ -329,7 +329,7 @@ const Dashboard = () => {
                 {/* Stats Grid */}
                 <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 6 }}>
                   {stats.map((stat, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                       <Card
                         sx={{
                           p: { xs: 2, md: 3 },
@@ -358,7 +358,7 @@ const Dashboard = () => {
 
                 {/* Analytics and Quick Actions */}
                 <Grid container spacing={{ xs: 3, md: 4 }}>
-                  <Grid item xs={12} lg={8}>
+                  <Grid size={{ xs: 12, lg: 8 }}>
                     {/* Performance Chart */}
                     <Card sx={{ p: { xs: 2, md: 3 }, mb: 4 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
@@ -379,7 +379,7 @@ const Dashboard = () => {
                           </Button>
                         </Box>
                       </Box>
-                      <Box sx={{ height: { xs: 250, sm: 300 }, minWidth: 0, minHeight: 0 }}>
+                      <Box sx={{ height: { xs: 250, sm: 300 }, width: '100%', minWidth: 0 }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -413,7 +413,7 @@ const Dashboard = () => {
                       </Typography>
                       <Grid container spacing={2}>
                         {exams.map((exam, index) => (
-                          <Grid item xs={12} sm={6} key={index}>
+                          <Grid size={{ xs: 12, sm: 6 }} key={index}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                               <Button
                                 fullWidth
@@ -476,7 +476,7 @@ const Dashboard = () => {
                   </Grid>
 
                   {/* Sidebar Content Placeholder */}
-                  <Grid item xs={12} lg={4}>
+                  <Grid size={{ xs: 12, lg: 4 }}>
                     <Card sx={{ p: { xs: 2, md: 3 } }}>
                       <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                         Recent Activity
