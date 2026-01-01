@@ -200,12 +200,12 @@ const Result = () => {
         <Container maxWidth="xl" sx={{ py: 4 }}>
           <Grid container spacing={4}>
             {/* Main Content */}
-            <Grid item xs={12} lg={8}>
+            <Grid size={{ xs: 12, lg: 8 }}>
               {/* Score Card */}
               <Fade in={true} timeout={1000}>
                 <Card sx={{ p: { xs: 2, sm: 4 }, mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: { xs: 2, md: 4 } }}>
                   <Box sx={{ width: { xs: 250, sm: 300 }, height: { xs: 250, sm: 300 }, position: 'relative' }}>
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                       <PieChart>
                         <Pie
                           data={chartData}
@@ -291,7 +291,7 @@ const Result = () => {
                       🎮 Game Mode Results
                     </Typography>
                     <Grid container spacing={3} sx={{ mt: 2 }}>
-                      <Grid item xs={6} sm={3}>
+                      <Grid size={{ xs: 6, sm: 3 }}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                             {gameStats.points}
@@ -301,7 +301,7 @@ const Result = () => {
                           </Typography>
                         </Box>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid size={{ xs: 6, sm: 3 }}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                             {gameStats.level}
@@ -311,7 +311,7 @@ const Result = () => {
                           </Typography>
                         </Box>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid size={{ xs: 6, sm: 3 }}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                             {gameStats.streak}
@@ -321,7 +321,7 @@ const Result = () => {
                           </Typography>
                         </Box>
                       </Grid>
-                      <Grid item xs={6} sm={3}>
+                      <Grid size={{ xs: 6, sm: 3 }}>
                         <Box sx={{ textAlign: 'center' }}>
                           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                             {attempt.score}
@@ -378,7 +378,7 @@ const Result = () => {
                           const isOptionSelected = i === resp?.selectedOption;
 
                           return (
-                            <Grid item xs={12} sm={6} key={i}>
+                            <Grid size={{ xs: 12, sm: 6 }} key={i}>
                               <Paper
                                 sx={{
                                   p: 2,
@@ -438,7 +438,7 @@ const Result = () => {
             </Grid>
 
             {/* Sidebar */}
-            <Grid item xs={12} lg={4}>
+            <Grid size={{ xs: 12, lg: 4 }}>
               <Card sx={{ p: 3, position: 'sticky', top: 20 }}>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', textTransform: 'uppercase' }}>
                   Phase Control

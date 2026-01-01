@@ -122,7 +122,7 @@ const Login = () => {
             )}
 
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <TextField
                   fullWidth
                   label="Email Address"
@@ -146,7 +146,7 @@ const Login = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <TextField
                   fullWidth
                   label="Password"
@@ -181,7 +181,7 @@ const Login = () => {
                 />
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Button
                   type="submit"
                   fullWidth

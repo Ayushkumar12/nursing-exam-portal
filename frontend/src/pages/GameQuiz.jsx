@@ -339,7 +339,7 @@ const GameQuiz = () => {
           <Container maxWidth="lg">
             <Box sx={{ py: { xs: 1, sm: 2 } }}>
               <Grid container spacing={2} alignItems="center" sx={{ mb: { xs: 1, sm: 2 } }}>
-                <Grid item xs={6} sm={3}>
+                <Grid size={{ xs: 6, sm: 3 }}>
                   <IconButton
                     onClick={handleExitClick}
                     sx={{
@@ -352,7 +352,7 @@ const GameQuiz = () => {
                     <ArrowBack />
                   </IconButton>
                 </Grid>
-                <Grid item xs={6} sm={9}>
+                <Grid size={{ xs: 6, sm: 9 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     <Chip
                       icon={<Timer />}

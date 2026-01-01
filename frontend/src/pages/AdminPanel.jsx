@@ -208,7 +208,7 @@ const AdminPanel = () => {
               { label: 'Total Attempts', value: stats.totalAttempts, icon: <ActivityIcon />, color: '#9c27b0', sub: 'Quiz attempts' },
               { label: 'Average Score', value: `${stats.averageScore}%`, icon: <AwardIcon />, color: '#ed6c02', sub: 'Performance' },
             ].map((stat, i) => (
-              <Grid item xs={12} sm={6} md={3} key={i}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
                 <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
                   <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)', border: '1px solid', borderColor: 'divider', position: 'relative', overflow: 'hidden' }}>
                     <Box sx={{ position: 'absolute', top: -10, right: -10, width: 80, height: 80, borderRadius: '50%', bgcolor: stat.color, opacity: 0.05 }} />
@@ -232,14 +232,14 @@ const AdminPanel = () => {
             {activeTab === 'overview' && (
               <motion.div key="overview" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <Grid container spacing={4}>
-                  <Grid item xs={12} lg={8}>
+                  <Grid size={{ xs: 12, lg: 8 }}>
                     <Card sx={{ borderRadius: 4, p: 3 }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                         <Typography variant="h6" fontWeight={700}>Performance Trends</Typography>
                         <TrendingUpIcon color="primary" />
                       </Stack>
                       <Box sx={{ height: 350, width: '100%' }}>
-                        <ResponsiveContainer>
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                           <AreaChart data={attempts.slice(-10)}>
                             <defs>
                               <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
@@ -257,7 +257,7 @@ const AdminPanel = () => {
                       </Box>
                     </Card>
                   </Grid>
-                  <Grid item xs={12} lg={4}>
+                  <Grid size={{ xs: 12, lg: 4 }}>
                     <Card sx={{ borderRadius: 4, p: 3, height: '100%' }}>
                       <Typography variant="h6" fontWeight={700} sx={{ mb: 3 }}>Activity Distribution</Typography>
                       <Stack spacing={3}>
@@ -277,7 +277,7 @@ const AdminPanel = () => {
                       </Stack>
                     </Card>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid size={12}>
                     <Card sx={{ borderRadius: 4, overflow: 'hidden' }}>
                       <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'grey.50', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2 }}>
                         <Typography variant="h6" fontWeight={700}>Recent Quiz Attempts</Typography>
@@ -425,16 +425,16 @@ const AdminPanel = () => {
                   </Box>
                   <Box component="form" onSubmit={handleSubmitQuestion} sx={{ p: { xs: 3, md: 6 } }}>
                     <Grid container spacing={4}>
-                      <Grid item xs={12} md={6}><TextField fullWidth label="Exam Type" placeholder="e.g., NORCET, ESIC" value={newQuestion.exam} onChange={(e) => setNewQuestion({ ...newQuestion, exam: e.target.value })} required variant="outlined" InputProps={{ startAdornment: <TargetIcon sx={{ color: 'action.active', mr: 1, fontSize: 20 }} /> }} /></Grid>
-                      <Grid item xs={12} md={6}><TextField fullWidth label="Topic / Subject" placeholder="e.g., Anatomy, Pharmacology" value={newQuestion.topic} onChange={(e) => setNewQuestion({ ...newQuestion, topic: e.target.value })} required variant="outlined" InputProps={{ startAdornment: <FileTextIcon sx={{ color: 'action.active', mr: 1, fontSize: 20 }} /> }} /></Grid>
-                      <Grid item xs={12}><TextField fullWidth multiline rows={4} label="Question Statement" value={newQuestion.question} onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })} required placeholder="Enter complete question..." /></Grid>
-                      <Grid item xs={12}>
+                      <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth label="Exam Type" placeholder="e.g., NORCET, ESIC" value={newQuestion.exam} onChange={(e) => setNewQuestion({ ...newQuestion, exam: e.target.value })} required variant="outlined" InputProps={{ startAdornment: <TargetIcon sx={{ color: 'action.active', mr: 1, fontSize: 20 }} /> }} /></Grid>
+                      <Grid size={{ xs: 12, md: 6 }}><TextField fullWidth label="Topic / Subject" placeholder="e.g., Anatomy, Pharmacology" value={newQuestion.topic} onChange={(e) => setNewQuestion({ ...newQuestion, topic: e.target.value })} required variant="outlined" InputProps={{ startAdornment: <FileTextIcon sx={{ color: 'action.active', mr: 1, fontSize: 20 }} /> }} /></Grid>
+                      <Grid size={12}><TextField fullWidth multiline rows={4} label="Question Statement" value={newQuestion.question} onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })} required placeholder="Enter complete question..." /></Grid>
+                      <Grid size={12}>
                         <Divider sx={{ mb: 2 }}><Chip label="Answer Options" size="small" /></Divider>
                         <FormControl component="fieldset" fullWidth>
                           <RadioGroup value={newQuestion.correct} onChange={(e) => setNewQuestion({ ...newQuestion, correct: parseInt(e.target.value) })}>
                             <Grid container spacing={2}>
                               {newQuestion.options.map((option, index) => (
-                                <Grid item xs={12} key={index}>
+                                <Grid size={12} key={index}>
                                   <Paper variant="outlined" sx={{ p: 1, borderRadius: 2, display: 'flex', alignItems: 'center', borderColor: newQuestion.correct === index ? 'primary.main' : 'divider', bgcolor: newQuestion.correct === index ? 'primary.50' : 'transparent' }}>
                                     <FormControlLabel value={index} control={<Radio />} label="" sx={{ mr: 0 }} />
                                     <TextField fullWidth size="small" variant="standard" placeholder={`Option ${index + 1}`} value={option} onChange={(e) => handleOptionChange(index, e.target.value)} required InputProps={{ disableUnderline: true }} />
@@ -446,8 +446,8 @@ const AdminPanel = () => {
                           </RadioGroup>
                         </FormControl>
                       </Grid>
-                      <Grid item xs={12}><TextField fullWidth multiline rows={3} label="Detailed Explanation" value={newQuestion.explanation} onChange={(e) => setNewQuestion({ ...newQuestion, explanation: e.target.value })} required placeholder="Explain why selected option is correct..." /></Grid>
-                      <Grid item xs={12}>
+                      <Grid size={12}><TextField fullWidth multiline rows={3} label="Detailed Explanation" value={newQuestion.explanation} onChange={(e) => setNewQuestion({ ...newQuestion, explanation: e.target.value })} required placeholder="Explain why selected option is correct..." /></Grid>
+                      <Grid size={12}>
                         <Stack direction="row" spacing={2} justifyContent="flex-end">
                           <Button variant="text" color="inherit" onClick={() => setNewQuestion({ exam: '', topic: '', question: '', options: ['', '', '', ''], correct: 0, explanation: '' })}>Reset Form</Button>
                           <Button type="submit" variant="contained" size="large" startIcon={<PlusCircleIcon />} sx={{ borderRadius: 3, px: 4, py: 1.5, fontWeight: 700 }}>Add to Bank</Button>
