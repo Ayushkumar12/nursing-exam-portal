@@ -1,6 +1,13 @@
 {
+  "version": 2,
   "outputDirectory": "frontend/dist",
+  "functions": {
+    "backend/server.js": {
+      "runtime": "vercel-node@latest"
+    }
+  },
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/backend/server.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

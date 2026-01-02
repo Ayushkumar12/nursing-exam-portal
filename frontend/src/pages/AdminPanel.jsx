@@ -26,6 +26,7 @@ const AdminPanel = () => {
   const [attempts, setAttempts] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,6 +42,7 @@ const AdminPanel = () => {
   const fetchAdminData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const [statsRes, usersRes, questionsRes, attemptsRes, activitiesRes] = await Promise.all([
         api.get('/admin/stats'), api.get('/admin/users'), api.get('/admin/questions'), api.get('/admin/attempts'), api.get('/admin/activities')
       ]);
@@ -51,6 +53,7 @@ const AdminPanel = () => {
       setActivities(activitiesRes.data);
     } catch (error) {
       console.error('Error fetching admin data:', error);
+      setError('Failed to fetch data from the server. The backend service may be starting up (Render free tier) or experiencing issues.');
     } finally {
       setLoading(false);
     }
@@ -91,6 +94,18 @@ const AdminPanel = () => {
     return (
       <Box sx={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
         <CircularProgress size={60} thickness={4} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default', p: 3, textAlign: 'center' }}>
+        <Typography variant="h6" color="error" gutterBottom sx={{ maxWidth: 600 }}>{error}</Typography>
+        <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+          <Button variant="contained" onClick={fetchAdminData}>Retry Connection</Button>
+          <Button variant="outlined" onClick={handleLogout}>Logout</Button>
+        </Stack>
       </Box>
     );
   }
@@ -239,8 +254,8 @@ const AdminPanel = () => {
                         <TrendingUpIcon color="primary" />
                       </Stack>
                       <Box sx={{ height: 350, width: '100%' }}>
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                          <AreaChart data={attempts.slice(-10)}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={Array.isArray(attempts) && attempts.length > 0 ? attempts.slice(-10) : []}>
                             <defs>
                               <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor={theme.palette.primary.main} stopOpacity={0.3}/>

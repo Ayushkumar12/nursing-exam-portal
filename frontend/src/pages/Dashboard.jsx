@@ -129,29 +129,29 @@ const Dashboard = () => {
     fetchHistory();
   }, []);
 
-  const chartData = history.slice().reverse().map(attempt => ({
+  const chartData = Array.isArray(history) ? history.slice().reverse().map(attempt => ({
     date: new Date(attempt.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-    score: Math.round((attempt.score / attempt.totalQuestions) * 100)
-  }));
+    score: Math.round((attempt.score / (attempt.totalQuestions || 1)) * 100)
+  })) : [];
 
   const stats = [
     {
       label: 'Total Quizzes',
-      value: history.length,
+      value: Array.isArray(history) ? history.length : 0,
       icon: MenuBook,
       color: blue[600],
     },
     {
       label: 'Avg Score',
-      value: (history.length > 0
-        ? (history.reduce((acc, curr) => acc + (curr.score / curr.totalQuestions), 0) / history.length * 100).toFixed(1)
+      value: (Array.isArray(history) && history.length > 0
+        ? (history.reduce((acc, curr) => acc + (curr.score / (curr.totalQuestions || 1)), 0) / history.length * 100).toFixed(1)
         : 0) + '%',
       icon: TrackChanges,
       color: green[600],
     },
     {
       label: 'Latest Score',
-      value: (history.length > 0 ? ((history[0].score / history[0].totalQuestions) * 100).toFixed(1) : 0) + '%',
+      value: (Array.isArray(history) && history.length > 0 ? ((history[0].score / (history[0].totalQuestions || 1)) * 100).toFixed(1) : 0) + '%',
       icon: EmojiEvents,
       color: amber[600],
     },
@@ -322,7 +322,7 @@ const Dashboard = () => {
                     Welcome back, {user?.name?.split(' ')[0] || 'User'}!
                   </Typography>
                   <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1.1rem', md: '1.25rem' }, maxWidth: { xs: '100%', md: '80%' } }}>
-                    You've completed {history.length} exams. Your performance is looking great!
+                    You've completed {Array.isArray(history) ? history.length : 0} exams. Your performance is looking great!
                   </Typography>
                 </Box>
 
@@ -379,8 +379,8 @@ const Dashboard = () => {
                           </Button>
                         </Box>
                       </Box>
-                      <Box sx={{ height: { xs: 250, sm: 300 }, width: '100%', minWidth: 0 }}>
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                      <Box sx={{ height: { xs: 250, sm: 300 }, width: '100%', minWidth: 0, minHeight: 250 }}>
+                        <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={chartData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                             <XAxis dataKey="date" stroke="#64748b" fontSize={12} />

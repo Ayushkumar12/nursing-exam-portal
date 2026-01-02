@@ -205,7 +205,7 @@ const Result = () => {
               <Fade in={true} timeout={1000}>
                 <Card sx={{ p: { xs: 2, sm: 4 }, mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: { xs: 2, md: 4 } }}>
                   <Box sx={{ width: { xs: 250, sm: 300 }, height: { xs: 250, sm: 300 }, position: 'relative' }}>
-                    <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                    <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
                           data={chartData}
