@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../api/axios';
-import { 
-  Box, 
-  Paper, 
-  IconButton, 
-  Typography, 
-  TextField, 
-  Fab, 
-  Avatar, 
-  CircularProgress, 
-  Tooltip, 
+import {
+  Box,
+  Paper,
+  IconButton,
+  Typography,
+  TextField,
+  Fab,
+  Avatar,
+  CircularProgress,
+  Tooltip,
   Zoom,
   Fade,
   Stack,
@@ -17,13 +17,13 @@ import {
   Button,
   Chip
 } from '@mui/material';
-import { 
-  Chat as ChatIcon, 
-  Close as CloseIcon, 
-  Send as SendIcon, 
-  SmartToy as BotIcon, 
-  Person as UserIcon, 
-  Minimize as MinimizeIcon, 
+import {
+  Chat as ChatIcon,
+  Close as CloseIcon,
+  Send as SendIcon,
+  SmartToy as BotIcon,
+  Person as UserIcon,
+  Minimize as MinimizeIcon,
   Fullscreen as MaximizeIcon,
   AutoAwesome as SparklesIcon,
   MenuBook as BookOpenIcon,
@@ -57,7 +57,7 @@ const Chatbot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isMinimized]);
+  }, [messages, isMinimized, isOpen]);
 
   const fetchHistory = async () => {
     try {
@@ -67,9 +67,9 @@ const Chatbot = () => {
         setMessages(response.data);
       } else {
         setMessages([
-          { 
-            role: 'assistant', 
-            content: "Hello! I'm your Smart Medical Tutor. I've reviewed your profile and I'm ready to help you excel in your nursing exams. What should we focus on today?" 
+          {
+            role: 'assistant',
+            content: "Hello! I'm your Smart Medical Tutor. I've reviewed your profile and I'm ready to help you excel in your nursing exams. What should we focus on today?"
           }
         ]);
       }
@@ -101,20 +101,20 @@ const Chatbot = () => {
   };
 
   return (
-    <Box sx={{ 
-      position: 'fixed', 
-      bottom: { xs: 16, md: 24 }, 
-      right: { xs: 16, md: 24 }, 
-      zIndex: 9999, 
-      display: 'flex', 
-      flexDirection: 'column', 
+    <Box sx={{
+      position: 'fixed',
+      bottom: { xs: 16, md: 24 },
+      right: { xs: 16, md: 24 },
+      zIndex: 9999,
+      display: 'flex',
+      flexDirection: 'column',
       alignItems: 'flex-end',
       maxWidth: 'calc(100vw - 32px)'
     }}>
-      <Zoom in={isOpen}>
-        <Paper 
+      <Zoom in={isOpen} unmountOnExit>
+        <Paper
           elevation={6}
-          sx={{ 
+          sx={{
             width: isMinimized ? { xs: 280, sm: 300 } : { xs: 'calc(100vw - 32px)', sm: 400 },
             height: isMinimized ? 64 : { xs: 'min(600px, calc(100vh - 100px))', sm: 600 },
             borderRadius: '24px',
@@ -127,11 +127,11 @@ const Chatbot = () => {
           }}
         >
           {/* Header */}
-          <Box 
-            sx={{ 
-              p: 2, 
-              display: 'flex', 
-              alignItems: 'center', 
+          <Box
+            sx={{
+              p: 2,
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'space-between',
               bgcolor: isMinimized ? 'primary.main' : 'transparent',
               borderBottom: isMinimized ? 'none' : '1px solid',
@@ -141,8 +141,8 @@ const Chatbot = () => {
             }}
           >
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexGrow: 1 }}>
-              <Avatar 
-                sx={{ 
+              <Avatar
+                sx={{
                   bgcolor: isMinimized ? 'rgba(255,255,255,0.2)' : 'primary.main',
                   width: 40,
                   height: 40
@@ -161,17 +161,17 @@ const Chatbot = () => {
                 </Stack>
               </Box>
             </Stack>
-            
+
             <Stack direction="row" spacing={0.5}>
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => setIsMinimized(!isMinimized)}
                 sx={{ color: isMinimized ? 'white' : 'text.secondary' }}
               >
                 {isMinimized ? <MaximizeIcon fontSize="small" /> : <MinimizeIcon fontSize="small" />}
               </IconButton>
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => setIsOpen(false)}
                 sx={{ color: isMinimized ? 'white' : 'text.secondary' }}
               >
@@ -246,9 +246,9 @@ const Chatbot = () => {
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton 
-                            type="submit" 
-                            color="primary" 
+                          <IconButton
+                            type="submit"
+                            color="primary"
                             disabled={isLoading || !input.trim()}
                             edge="end"
                           >
@@ -268,13 +268,13 @@ const Chatbot = () => {
 
       {!isOpen && (
         <Zoom in={!isOpen}>
-          <Fab 
-            color="primary" 
-            aria-label="chat" 
+          <Fab
+            color="primary"
+            aria-label="chat"
             onClick={() => setIsOpen(true)}
-            sx={{ 
-              width: 64, 
-              height: 64, 
+            sx={{
+              width: 64,
+              height: 64,
               boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
               '&:hover': { transform: 'scale(1.05)' },
               transition: 'transform 0.2s'

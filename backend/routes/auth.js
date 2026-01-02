@@ -7,10 +7,10 @@ const { logActivity } = require('../utils/logger');
 // Register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, image } = req.body;
     const user = new User({ name, email, password });
     await user.save();
-    await logActivity(user._id, 'REGISTER', 'User registered');
+    await logActivity(user._id, 'REGISTER', 'User registered', image);
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     // Remove password from response
     const userResponse = user.toObject();
@@ -24,9 +24,9 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, image } = req.body;
 
-    console.log('Login attempt:', { email, hasPassword: !!password });
+    console.log('Login attempt:', { email, hasPassword: !!password, hasImage: !!image });
 
     // Check hardcoded admin
     if (email === 'admin@example.com' && password === 'admin123') {
@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
         }
       }
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-      await logActivity(user._id, 'LOGIN', 'Admin login');
+      await logActivity(user._id, 'LOGIN', 'Admin login', image);
       // Remove password from response
       const userResponse = user.toObject();
       delete userResponse.password;
@@ -64,7 +64,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).send({ error: 'Invalid login credentials' });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    await logActivity(user._id, 'LOGIN', 'Student login');
+    await logActivity(user._id, 'LOGIN', 'Student login', image);
     // Remove password from response
     const userResponse = user.toObject();
     delete userResponse.password;

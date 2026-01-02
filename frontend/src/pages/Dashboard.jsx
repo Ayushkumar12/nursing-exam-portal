@@ -118,7 +118,6 @@ const Dashboard = () => {
       } catch (err) {
         if (err.response && err.response.status === 401) {
           logout();
-          navigate('/login');
         } else {
           console.error(err);
           setError('Failed to load quiz history. Please try again later.');
@@ -160,7 +159,6 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
   };
 
   return (
@@ -194,7 +192,7 @@ const Dashboard = () => {
               value={activeTab}
               onChange={(event, newValue) => setActiveTab(newValue)}
               sx={{
-                flex: 1,
+                mr: 'auto',
                 '& .MuiTab-root': {
                   textTransform: 'none',
                   minHeight: 48,
@@ -209,14 +207,14 @@ const Dashboard = () => {
               <Tab icon={<EmojiEvents />} label="Certificates" />
             </Tabs>
 
-            <Box sx={{ flex: 1, display: { xs: 'none', md: 'block' } }}>
+            <Box sx={{ display: { xs: 'none', md: 'block' }, mr: 4 }}>
               <Paper
                 component="form"
                 sx={{
                   p: '2px 4px',
                   display: 'flex',
                   alignItems: 'center',
-                  width: 400,
+                  width: 300,
                   borderRadius: 3,
                   bgcolor: 'grey.50',
                 }}
@@ -231,7 +229,7 @@ const Dashboard = () => {
               </Paper>
             </Box>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, position: 'relative', zIndex: 10 }}>
               <IconButton>
                 <Badge badgeContent={3} color="error">
                   <Notifications />
@@ -245,7 +243,7 @@ const Dashboard = () => {
                 color="error"
                 startIcon={<Logout />}
                 onClick={handleLogout}
-                sx={{ ml: 2, display: { xs: 'none', sm: 'inline-flex' } }}
+                sx={{ ml: 2, display: { xs: 'none', sm: 'inline-flex' }, pointerEvents: 'auto' }}
               >
                 Logout
               </Button>
@@ -312,7 +310,7 @@ const Dashboard = () => {
                 fullWidth
                 startIcon={<Logout />}
                 onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                sx={{ justifyContent: 'flex-start', mb: 1, color: 'error.main' }}
+                sx={{ justifyContent: 'flex-start', mb: 1, color: 'error.main', pointerEvents: 'auto' }}
               >
                 Logout
               </Button>

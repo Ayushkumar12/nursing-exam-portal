@@ -36,7 +36,6 @@ const AdminPanel = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
   };
 
   const fetchAdminData = async () => {
@@ -162,13 +161,13 @@ const AdminPanel = () => {
             ))}
           </Tabs>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, position: 'relative', zIndex: 10 }}>
             <Button
               variant="outlined"
               color="error"
               startIcon={<Logout />}
               onClick={handleLogout}
-              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+              sx={{ display: { xs: 'none', sm: 'inline-flex' }, pointerEvents: 'auto' }}
             >
               Logout
             </Button>
@@ -206,7 +205,7 @@ const AdminPanel = () => {
                 fullWidth
                 startIcon={<Logout />}
                 onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                sx={{ justifyContent: 'flex-start', mb: 1, color: 'error.main' }}
+                sx={{ justifyContent: 'flex-start', mb: 1, color: 'error.main', pointerEvents: 'auto' }}
               >
                 Logout
               </Button>

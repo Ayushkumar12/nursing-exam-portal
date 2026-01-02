@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -33,15 +33,51 @@ const Register = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let stream = null;
+    const startWebcam = async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { width: 300, height: 225 } });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error("Error accessing webcam:", err);
+      }
+    };
+
+    startWebcam();
+
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      context.drawImage(videoRef.current, 0, 0, 300, 225);
+      return canvasRef.current.toDataURL('image/jpeg');
+    }
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
+    
+    const image = captureImage();
+    
     try {
-      await register(name, email, password);
+      await register(name, email, password, image);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Please try again.');
@@ -112,6 +148,20 @@ const Register = () => {
 
           {/* Register Form */}
           <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            <Box sx={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{ width: '300px', height: '225px' }}
+              />
+              <canvas
+                ref={canvasRef}
+                width="300"
+                height="225"
+              />
+            </Box>
             <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold', mb: 3, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
               Create Your Account
             </Typography>
