@@ -1,12 +1,11 @@
 const Activity = require('../models/Activity');
 
-const logActivity = async (userId, action, details = '', image = null) => {
+const logActivity = async (userId, action, details = '') => {
   try {
     const activity = new Activity({
       user: userId,
       action,
-      details,
-      image
+      details
     });
     await activity.save();
   } catch (error) {

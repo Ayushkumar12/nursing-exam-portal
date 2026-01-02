@@ -23,16 +23,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password, image) => {
-    const { data } = await api.post('/auth/login', { email, password, image });
+  const login = async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password });
     setUser(data.user);
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     return data.user;
   };
 
-  const register = async (name, email, password, image) => {
-    const { data } = await api.post('/auth/register', { name, email, password, image });
+  const register = async (name, email, password) => {
+    const { data } = await api.post('/auth/register', { name, email, password });
     setUser(data.user);
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
