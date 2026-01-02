@@ -141,4 +141,92 @@ router.get('/activities', auth, adminAuth, async (req, res) => {
   }
 });
 
+// Add new student
+router.post('/students', auth, adminAuth, async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send({ error: 'Email already in use' });
+    }
+    const student = new User({
+      name,
+      email,
+      password,
+      role: 'student'
+    });
+    await student.save();
+    res.status(201).send({ message: 'Student created successfully', student: { id: student._id, name: student.name, email: student.email } });
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
+
+// Delete student
+router.delete('/students/:id', auth, adminAuth, async (req, res) => {
+  try {
+    const student = await User.findOneAndDelete({ _id: req.params.id, role: 'student' });
+    if (!student) {
+      return res.status(404).send({ error: 'Student not found' });
+    }
+    // Also delete their attempts
+    await Attempt.deleteMany({ user: req.params.id });
+    res.send({ message: 'Student and their data deleted successfully' });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Get student report
+router.get('/students/:id/report', auth, adminAuth, async (req, res) => {
+  try {
+    const student = await User.findOne({ _id: req.params.id, role: 'student' }).select('-password');
+    if (!student) {
+      return res.status(404).send({ error: 'Student not found' });
+    }
+    const attempts = await Attempt.find({ user: student._id }).sort({ date: -1 });
+    
+    const report = {
+      student,
+      attempts,
+      stats: {
+        totalAttempts: attempts.length,
+        averageScore: attempts.length > 0 
+          ? (attempts.reduce((sum, a) => sum + (a.score / a.totalQuestions), 0) / attempts.length) * 100 
+          : 0,
+        highestScore: attempts.length > 0
+          ? Math.max(...attempts.map(a => (a.score / a.totalQuestions) * 100))
+          : 0
+      }
+    };
+    
+    res.send(report);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Download student report as CSV
+router.get('/students/:id/report/download', auth, adminAuth, async (req, res) => {
+  try {
+    const student = await User.findOne({ _id: req.params.id, role: 'student' }).select('-password');
+    if (!student) {
+      return res.status(404).send({ error: 'Student not found' });
+    }
+    const attempts = await Attempt.find({ user: student._id }).sort({ date: -1 });
+    
+    let csv = 'Exam,Date,Score,Total Questions,Percentage\n';
+    attempts.forEach(a => {
+      const percentage = ((a.score / a.totalQuestions) * 100).toFixed(2);
+      csv += `"${a.exam}","${new Date(a.date).toLocaleDateString()}",${a.score},${a.totalQuestions},${percentage}%\n`;
+    });
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=report_${student.name.replace(/\s+/g, '_')}.csv`);
+    res.send(csv);
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
 module.exports = router;

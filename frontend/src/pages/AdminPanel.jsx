@@ -7,10 +7,10 @@ import {
 } from 'recharts';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import {
-  Container, Box, Typography, Card, CardContent, Grid, Paper, Button, Avatar, Chip, AppBar, Toolbar, IconButton, TextField, FormControl, CircularProgress, Divider, useTheme, useMediaQuery, Stack, Radio, RadioGroup, FormControlLabel, Tabs, Tab,
+  Container, Box, Typography, Card, CardContent, Grid, Paper, Button, Avatar, Chip, AppBar, Toolbar, IconButton, TextField, FormControl, CircularProgress, Divider, useTheme, useMediaQuery, Stack, Radio, RadioGroup, FormControlLabel, Tabs, Tab, Dialog, DialogTitle, DialogContent, DialogActions, List, ListItem, ListItemText,
 } from '@mui/material';
 import {
-  Delete as DeleteIcon, Logout, Person, Menu, Close, Home as HomeIcon, People as UsersIcon, Description as FileTextIcon, TrendingUp as TrendingUpIcon, Add as PlusCircleIcon, VerifiedUser as ShieldCheckIcon, GpsFixed as TargetIcon, Timeline as ActivityIcon, EmojiEvents as AwardIcon, Download,
+  Delete as DeleteIcon, Logout, Person, Menu, Close, Home as HomeIcon, People as UsersIcon, Description as FileTextIcon, TrendingUp as TrendingUpIcon, Add as PlusCircleIcon, VerifiedUser as ShieldCheckIcon, GpsFixed as TargetIcon, Timeline as ActivityIcon, EmojiEvents as AwardIcon, Download, Visibility,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -31,6 +31,10 @@ const AdminPanel = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [newQuestion, setNewQuestion] = useState({ exam: '', topic: '', question: '', options: ['', '', '', ''], correct: 0, explanation: '' });
+  const [newStudent, setNewStudent] = useState({ name: '', email: '', password: '' });
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [selectedStudentReport, setSelectedStudentReport] = useState(null);
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   useEffect(() => { fetchAdminData(); }, []);
 
@@ -87,6 +91,48 @@ const AdminPanel = () => {
     const updatedOptions = [...newQuestion.options];
     updatedOptions[index] = value;
     setNewQuestion({ ...newQuestion, options: updatedOptions });
+  };
+
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/admin/students', newStudent);
+      alert('Student added successfully!');
+      setShowAddStudent(false);
+      setNewStudent({ name: '', email: '', password: '' });
+      fetchAdminData();
+    } catch (error) {
+      console.error('Error adding student:', error);
+      alert(error.response?.data?.error || 'Failed to add student.');
+    }
+  };
+
+  const handleDeleteStudent = async (id) => {
+    if (window.confirm('Are you sure you want to delete this student and all their data?')) {
+      try {
+        await api.delete(`/admin/students/${id}`);
+        alert('Student deleted successfully!');
+        fetchAdminData();
+      } catch (error) {
+        console.error('Error deleting student:', error);
+        alert('Failed to delete student.');
+      }
+    }
+  };
+
+  const handleViewReport = async (id) => {
+    try {
+      const response = await api.get(`/admin/students/${id}/report`);
+      setSelectedStudentReport(response.data);
+      setShowReportDialog(true);
+    } catch (error) {
+      console.error('Error fetching report:', error);
+      alert('Failed to fetch student report.');
+    }
+  };
+
+  const handleDownloadReport = (id) => {
+    window.open(`${api.defaults.baseURL}/admin/students/${id}/report/download`, '_blank');
   };
 
   if (loading) {
@@ -335,7 +381,10 @@ const AdminPanel = () => {
                       <UsersIcon color="primary" /><Typography variant="h6" fontWeight={700}>User Management</Typography>
                       <Chip label={users.length} size="small" color="primary" />
                     </Stack>
-                    <Button variant="outlined" startIcon={<Download />} onClick={() => exportData(users, 'users.json')} sx={{ borderRadius: 2 }}>Export Users</Button>
+                    <Stack direction="row" spacing={2}>
+                      <Button variant="contained" startIcon={<PlusCircleIcon />} onClick={() => setShowAddStudent(true)} sx={{ borderRadius: 2 }}>Add Student</Button>
+                      <Button variant="outlined" startIcon={<Download />} onClick={() => exportData(users, 'users.json')} sx={{ borderRadius: 2 }}>Export Users</Button>
+                    </Stack>
                   </Box>
                   <Box sx={{ height: 600, width: '100%', overflowX: 'auto' }}>
                     <Box sx={{ minWidth: 800, height: '100%' }}>
@@ -353,7 +402,19 @@ const AdminPanel = () => {
                             <Chip label={params.value} size="small" color={params.value === 'admin' ? 'secondary' : 'primary'} variant="outlined" sx={{ fontWeight: 600, textTransform: 'capitalize' }} />
                           )},
                         { field: 'createdAt', headerName: 'Joined', flex: 0.8, valueFormatter: (value) => new Date(value).toLocaleDateString() },
-                        { field: 'actions', headerName: 'Actions', flex: 0.5, sortable: false, renderCell: () => (<IconButton size="small" color="error"><DeleteIcon fontSize="small" /></IconButton>) }
+                        { field: 'actions', headerName: 'Actions', flex: 0.8, sortable: false, renderCell: (params) => (
+                          <Stack direction="row" spacing={1}>
+                            <IconButton size="small" color="primary" onClick={() => handleViewReport(params.row._id)} title="View Report">
+                              <Visibility fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" color="secondary" onClick={() => handleDownloadReport(params.row._id)} title="Download Report">
+                              <Download fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" color="error" onClick={() => handleDeleteStudent(params.row._id)} title="Delete Student">
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Stack>
+                        ) }
                       ]}
                       slots={{ toolbar: GridToolbar }} pageSizeOptions={[10, 25, 50]} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} disableRowSelectionOnClick sx={{ border: 'none' }}
                     />
@@ -475,6 +536,117 @@ const AdminPanel = () => {
           </AnimatePresence>
         </Container>
       </Box>
+
+      {/* Add Student Dialog */}
+      <Dialog open={showAddStudent} onClose={() => setShowAddStudent(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700 }}>Add New Student</DialogTitle>
+        <Box component="form" onSubmit={handleAddStudent}>
+          <DialogContent dividers>
+            <Stack spacing={3}>
+              <TextField
+                fullWidth
+                label="Full Name"
+                value={newStudent.name}
+                onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                required
+              />
+              <TextField
+                fullWidth
+                label="Email Address"
+                type="email"
+                value={newStudent.email}
+                onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                required
+              />
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                value={newStudent.password}
+                onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
+                required
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 2.5 }}>
+            <Button onClick={() => setShowAddStudent(false)}>Cancel</Button>
+            <Button type="submit" variant="contained" sx={{ borderRadius: 2 }}>Create Student</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+
+      {/* Student Report Dialog */}
+      <Dialog open={showReportDialog} onClose={() => setShowReportDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          Student Performance Report
+          {selectedStudentReport && (
+            <Button 
+              startIcon={<Download />} 
+              size="small" 
+              onClick={() => handleDownloadReport(selectedStudentReport.student._id)}
+            >
+              Download CSV
+            </Button>
+          )}
+        </DialogTitle>
+        <DialogContent dividers>
+          {selectedStudentReport ? (
+            <Box>
+              <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', borderRadius: 3 }}>
+                    <Typography variant="caption" color="text.secondary">Total Attempts</Typography>
+                    <Typography variant="h5" fontWeight={700}>{selectedStudentReport.stats.totalAttempts}</Typography>
+                  </Paper>
+                </Grid>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', borderRadius: 3 }}>
+                    <Typography variant="caption" color="text.secondary">Average Score</Typography>
+                    <Typography variant="h5" fontWeight={700} color="primary">{selectedStudentReport.stats.averageScore.toFixed(2)}%</Typography>
+                  </Paper>
+                </Grid>
+                <Grid size={{ xs: 12, md: 4 }}>
+                  <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', borderRadius: 3 }}>
+                    <Typography variant="caption" color="text.secondary">Highest Score</Typography>
+                    <Typography variant="h5" fontWeight={700} color="success.main">{selectedStudentReport.stats.highestScore.toFixed(2)}%</Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+
+              <Typography variant="subtitle1" fontWeight={700} gutterBottom>Recent Attempts</Typography>
+              <List>
+                {selectedStudentReport.attempts.length > 0 ? (
+                  selectedStudentReport.attempts.map((attempt) => (
+                    <ListItem key={attempt._id} divider>
+                      <ListItemText 
+                        primary={attempt.exam} 
+                        secondary={new Date(attempt.date).toLocaleString()} 
+                      />
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="h6" fontWeight={700} color={(attempt.score / attempt.totalQuestions * 100) >= 50 ? 'success.main' : 'error.main'}>
+                          {((attempt.score / attempt.totalQuestions) * 100).toFixed(2)}%
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {attempt.score}/{attempt.totalQuestions} Questions
+                        </Typography>
+                      </Box>
+                    </ListItem>
+                  ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+                    No attempts recorded yet.
+                  </Typography>
+                )}
+              </List>
+            </Box>
+          ) : (
+            <Box sx={{ py: 5, textAlign: 'center' }}><CircularProgress /></Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setShowReportDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
