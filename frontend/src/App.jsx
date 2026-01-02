@@ -8,6 +8,7 @@ import Quiz from './pages/Quiz';
 import GameQuiz from './pages/GameQuiz';
 import Result from './pages/Result';
 import AdminPanel from './pages/AdminPanel';
+import Chatbot from './components/Chatbot';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -16,6 +17,12 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   if (!user) return <Navigate to="/login" />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/dashboard" />;
   return children;
+};
+
+const ChatbotWrapper = () => {
+  const { user } = useAuth();
+  if (!user || user.role === 'admin') return null;
+  return <Chatbot />;
 };
 
 const DefaultRedirect = () => {
@@ -41,6 +48,7 @@ function App() {
     <Router>
       <AuthProvider>
         <div className="App">
+          <ChatbotWrapper />
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/" element={<DefaultRedirect />} />
