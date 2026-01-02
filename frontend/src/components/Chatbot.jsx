@@ -1,175 +1,290 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../api/axios';
-import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Box, 
+  Paper, 
+  IconButton, 
+  Typography, 
+  TextField, 
+  Fab, 
+  Avatar, 
+  CircularProgress, 
+  Tooltip, 
+  Zoom,
+  Fade,
+  Stack,
+  InputAdornment,
+  Button,
+  Chip
+} from '@mui/material';
+import { 
+  Chat as ChatIcon, 
+  Close as CloseIcon, 
+  Send as SendIcon, 
+  SmartToy as BotIcon, 
+  Person as UserIcon, 
+  Minimize as MinimizeIcon, 
+  Fullscreen as MaximizeIcon,
+  AutoAwesome as SparklesIcon,
+  MenuBook as BookOpenIcon,
+  AssignmentTurnedIn as ClipboardCheckIcon,
+  MedicalServices as StethoscopeIcon
+} from '@mui/icons-material';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hello! I am your AI Medical Assistant. How can I help you with your nursing studies today?' }
-  ]);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const quickActions = [
+    { icon: <BookOpenIcon sx={{ fontSize: 16 }} />, label: 'Study Tips', prompt: 'Give me some nursing study tips.' },
+    { icon: <ClipboardCheckIcon sx={{ fontSize: 16 }} />, label: 'Analyze Results', prompt: 'Analyze my performance.' },
+    { icon: <StethoscopeIcon sx={{ fontSize: 16 }} />, label: 'Case Study', prompt: 'Give me a medical case.' },
+  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      fetchHistory();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isMinimized]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const fetchHistory = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get('/ai/history');
+      if (response.data && response.data.length > 0) {
+        setMessages(response.data);
+      } else {
+        setMessages([
+          { 
+            role: 'assistant', 
+            content: "Hello! I'm your Smart Medical Tutor. I've reviewed your profile and I'm ready to help you excel in your nursing exams. What should we focus on today?" 
+          }
+        ]);
+      }
+    } catch (error) {
+      setMessages([{ role: 'assistant', content: 'Hello! How can I assist with your medical studies today?' }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const userMessage = { role: 'user', content: input };
+  const handleSend = async (text = input) => {
+    const messageToSend = typeof text === 'string' ? text : input;
+    if (!messageToSend.trim()) return;
+
+    const userMessage = { role: 'user', content: messageToSend };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const response = await api.post('/ai/chat', { message: input });
+      const response = await api.post('/ai/chat', { message: messageToSend });
       const assistantMessage = { role: 'assistant', content: response.data.reply };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Chat Error:', error);
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: 'Sorry, I encountered an error. Please try again later.' }
-      ]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Technical error. Please try again.' }]);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[1000]">
-      {/* Chat Toggle Button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-xl transition-all duration-300 flex items-center justify-center relative overflow-hidden group"
-        style={{
-          boxShadow: '0 8px 30px rgba(37, 99, 235, 0.4)',
-          background: 'linear-gradient(135deg, #2563eb, #1d4ed8)'
-        }}
-      >
-        <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        {isOpen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-        )}
-      </motion.button>
-
-      {/* Chat Window */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="absolute bottom-20 right-0 w-[380px] md:w-[420px] h-[600px] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-blue-50/50"
-            style={{
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
+    <Box sx={{ 
+      position: 'fixed', 
+      bottom: { xs: 16, md: 24 }, 
+      right: { xs: 16, md: 24 }, 
+      zIndex: 9999, 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'flex-end',
+      maxWidth: 'calc(100vw - 32px)'
+    }}>
+      <Zoom in={isOpen}>
+        <Paper 
+          elevation={6}
+          sx={{ 
+            width: isMinimized ? { xs: 280, sm: 300 } : { xs: 'calc(100vw - 32px)', sm: 400 },
+            height: isMinimized ? 64 : { xs: 'min(600px, calc(100vh - 100px))', sm: 600 },
+            borderRadius: '24px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            mb: 2,
+            transition: 'all 0.3s ease-in-out',
+            bgcolor: 'background.paper'
+          }}
+        >
+          {/* Header */}
+          <Box 
+            sx={{ 
+              p: 2, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              bgcolor: isMinimized ? 'primary.main' : 'transparent',
+              borderBottom: isMinimized ? 'none' : '1px solid',
+              borderColor: 'divider',
+              color: isMinimized ? 'white' : 'text.primary',
+              transition: 'background-color 0.3s'
             }}
           >
-            {/* Header */}
-            <div className="bg-blue-600 px-6 py-5 text-white flex items-center justify-between relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-              <div className="flex items-center space-x-3 relative z-10">
-                <div className="w-10 h-10 bg-white/20 rounded-xl backdrop-blur-md flex items-center justify-center border border-white/30">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.675.337a4 4 0 01-2.58.344l-2.387-.477a2 2 0 00-1.022.547l-1.162 1.162a2 2 0 01-2.596.25l-1.306-.98a2 2 0 01-.652-2.147l.453-1.812a2 2 0 01.38-.686l1.357-1.357a2 2 0 012.147-.652l1.98.495a2 2 0 001.352-.303l.63-.42a2 2 0 011.63-.303l1.98.495a2 2 0 012.147.652l1.357 1.357a2 2 0 01.38.686l.453 1.812a2 2 0 01-.652 2.147l-1.306.98a2 2 0 01-2.596-.25l-1.162-1.162z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg leading-tight">Medical Assistant</h3>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-xs text-blue-100 font-medium">Always Online</span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white/80 hover:text-white transition-colors"
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flexGrow: 1 }}>
+              <Avatar 
+                sx={{ 
+                  bgcolor: isMinimized ? 'rgba(255,255,255,0.2)' : 'primary.main',
+                  width: 40,
+                  height: 40
+                }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12H6" />
-                </svg>
-              </button>
-            </div>
+                <BotIcon />
+              </Avatar>
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  Smart AI Tutor
+                  {!isMinimized && <SparklesIcon sx={{ fontSize: 14, color: 'warning.main' }} />}
+                </Typography>
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                  <Box sx={{ width: 6, height: 6, bgcolor: isMinimized ? 'white' : 'success.main', borderRadius: '50%' }} />
+                  <Typography variant="caption" sx={{ opacity: 0.8, fontWeight: 500, letterSpacing: 0.5 }}>ONLINE</Typography>
+                </Stack>
+              </Box>
+            </Stack>
+            
+            <Stack direction="row" spacing={0.5}>
+              <IconButton 
+                size="small" 
+                onClick={() => setIsMinimized(!isMinimized)}
+                sx={{ color: isMinimized ? 'white' : 'text.secondary' }}
+              >
+                {isMinimized ? <MaximizeIcon fontSize="small" /> : <MinimizeIcon fontSize="small" />}
+              </IconButton>
+              <IconButton 
+                size="small" 
+                onClick={() => setIsOpen(false)}
+                sx={{ color: isMinimized ? 'white' : 'text.secondary' }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          </Box>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-blue-50/30 to-white">
-              {messages.map((msg, index) => (
-                <motion.div
-                  initial={{ opacity: 0, x: msg.role === 'user' ? 10 : -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  key={index}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] p-4 rounded-2xl shadow-sm ${
-                      msg.role === 'user'
-                        ? 'bg-blue-600 text-white rounded-tr-none'
-                        : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none'
-                    }`}
-                  >
-                    <p className="text-[15px] leading-relaxed font-medium">{msg.content}</p>
-                  </div>
-                </motion.div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 rounded-tl-none">
-                    <div className="flex space-x-1.5">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+          {!isMinimized && (
+            <>
+              {/* Messages Area */}
+              <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {messages.map((msg, index) => (
+                  <Fade in={true} key={index}>
+                    <Box sx={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          maxWidth: '85%',
+                          p: 1.5,
+                          borderRadius: '16px',
+                          borderBottomRightRadius: msg.role === 'user' ? 0 : '16px',
+                          borderBottomLeftRadius: msg.role === 'assistant' ? 0 : '16px',
+                          bgcolor: msg.role === 'user' ? 'primary.main' : 'grey.100',
+                          color: msg.role === 'user' ? 'white' : 'text.primary',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5
+                        }}
+                      >
+                        {msg.content}
+                      </Paper>
+                    </Box>
+                  </Fade>
+                ))}
+                {isLoading && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <Paper sx={{ p: 1.5, borderRadius: '16px', borderBottomLeftRadius: 0, bgcolor: 'grey.100' }}>
+                      <CircularProgress size={16} thickness={5} />
+                    </Paper>
+                  </Box>
+                )}
+                <div ref={messagesEndRef} />
+              </Box>
 
-            {/* Input Area */}
-            <form onSubmit={handleSend} className="p-5 bg-white border-t border-slate-100">
-              <div className="relative flex items-center">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask a medical question..."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3.5 pr-14 text-[15px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
-                  disabled={isLoading}
-                />
-                <button
-                  type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="absolute right-2 p-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white rounded-xl transition-all duration-200 shadow-md disabled:shadow-none"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                  </svg>
-                </button>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-3 text-center">
-                Powered by AI • For educational purposes only
-              </p>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+              {/* Footer */}
+              <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                {messages.length < 4 && (
+                  <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1, mb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
+                    {quickActions.map((action, idx) => (
+                      <Chip
+                        key={idx}
+                        icon={action.icon}
+                        label={action.label}
+                        onClick={() => handleSend(action.prompt)}
+                        variant="outlined"
+                        size="small"
+                        sx={{ fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                      />
+                    ))}
+                  </Stack>
+                )}
+
+                <form onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Type a message..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    disabled={isLoading}
+                    autoComplete="off"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton 
+                            type="submit" 
+                            color="primary" 
+                            disabled={isLoading || !input.trim()}
+                            edge="end"
+                          >
+                            <SendIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                      sx: { borderRadius: '12px' }
+                    }}
+                  />
+                </form>
+              </Box>
+            </>
+          )}
+        </Paper>
+      </Zoom>
+
+      {!isOpen && (
+        <Zoom in={!isOpen}>
+          <Fab 
+            color="primary" 
+            aria-label="chat" 
+            onClick={() => setIsOpen(true)}
+            sx={{ 
+              width: 64, 
+              height: 64, 
+              boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+              '&:hover': { transform: 'scale(1.05)' },
+              transition: 'transform 0.2s'
+            }}
+          >
+            <ChatIcon sx={{ fontSize: 28 }} />
+          </Fab>
+        </Zoom>
+      )}
+    </Box>
   );
 };
 
