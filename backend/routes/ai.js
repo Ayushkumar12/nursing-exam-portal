@@ -25,26 +25,33 @@ router.post('/chat', auth, async (req, res) => {
     // Fetch previous exam attempts
     const attempts = await Attempt.find({ user: userId }).sort({ date: -1 }).limit(5);
     
+    const performanceSummary = attempts.length > 0 
+      ? attempts.map(a => `- Exam: ${a.exam}, Score: ${a.score}/${a.totalQuestions}, Date: ${new Date(a.date).toLocaleDateString()}`).join('\n')
+      : 'No exams taken yet.';
+
     // Fetch chat history
     let chat = await Chat.findOne({ user: userId });
     if (!chat) {
       chat = new Chat({ user: userId, messages: [] });
     }
 
-    // Construct context-aware system instructions
-    let examContext = "";
-    if (attempts.length > 0) {
-      examContext = "\n\nStudent's Recent Exam Performance:\n" + 
-        attempts.map(a => `- Exam: ${a.exam}, Score: ${a.score}/${a.totalQuestions}, Date: ${new Date(a.date).toLocaleDateString()}`).join('\n');
-    }
-
+    
     const systemInstruction = `You are a professional medical assistant and educator for nursing students. 
 Your goal is to provide accurate, helpful, and encouraging information about medical topics, nursing practices, and exam preparation. 
 Always maintain a professional tone and emphasize patient safety and evidence-based practice.
 
 Student Information:
 - Name: ${user.name}
-- Current Focus: Nursing Exam Preparation${examContext}
+- Current Focus: Nursing Exam Preparation
+
+Recent Exam Performance:
+${performanceSummary}
+
+When the student asks about their results or performance:
+1. Provide a short, easy-to-understand summary.
+2. Highlight their strengths and areas for improvement.
+3. Keep the language simple and encouraging.
+4. If they haven't taken any exams, encourage them to start a practice test.
 
 Use the student's name and previous performance to personalize your responses. If they are struggling in certain areas, provide extra guidance and encouragement.
 If a question is outside the medical scope or is inappropriate, politely redirect the student to relevant medical topics.`;

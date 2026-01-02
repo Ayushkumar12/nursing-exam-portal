@@ -46,6 +46,7 @@ import {
   LocalHospital,
   Menu,
   Close,
+  Chat,
 } from '@mui/icons-material';
 import { blue, green, amber, purple, grey } from '@mui/material/colors';
 
@@ -293,8 +294,16 @@ const Dashboard = () => {
               </Button>
               <Button
                 fullWidth
+                startIcon={<Chat />}
+                onClick={() => { navigate('/chatbot'); setMobileMenuOpen(false); }}
+                sx={{ justifyContent: 'flex-start', mb: 1 }}
+              >
+                Chatbot
+              </Button>
+              <Button
+                fullWidth
                 startIcon={<EmojiEvents />}
-                onClick={() => { setActiveTab(3); setMobileMenuOpen(false); }}
+                onClick={() => { setActiveTab(4); setMobileMenuOpen(false); }}
                 sx={{ justifyContent: 'flex-start', mb: 1 }}
               >
                 Certificates

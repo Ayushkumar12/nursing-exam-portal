@@ -8,6 +8,7 @@ import Quiz from './pages/Quiz';
 import GameQuiz from './pages/GameQuiz';
 import Result from './pages/Result';
 import AdminPanel from './pages/AdminPanel';
+import ChatbotPage from './pages/ChatbotPage';
 import Chatbot from './components/Chatbot';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -58,6 +59,7 @@ function App() {
               <Route path="/quiz/:exam" element={<ProtectedRoute><PageWrapper><Quiz /></PageWrapper></ProtectedRoute>} />
               <Route path="/game-quiz/:exam" element={<ProtectedRoute><PageWrapper><GameQuiz /></PageWrapper></ProtectedRoute>} />
               <Route path="/result" element={<ProtectedRoute><PageWrapper><Result /></PageWrapper></ProtectedRoute>} />
+              <Route path="/chatbot" element={<ProtectedRoute><PageWrapper><ChatbotPage /></PageWrapper></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute adminOnly><PageWrapper><AdminPanel /></PageWrapper></ProtectedRoute>} />
               <Route path="*" element={<DefaultRedirect />} />
             </Routes>
