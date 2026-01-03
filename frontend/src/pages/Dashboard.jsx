@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import TypingEffect from '../components/ui/TypingEffect';
+import ScrollIn from '../components/ui/ScrollIn';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import ReportCard from '../components/ReportCard';
 import {
   ThemeProvider,
   createTheme,
@@ -95,12 +99,44 @@ const theme = createTheme({
   },
 });
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+    },
+  },
+};
+
+const hoverVariants = {
+  hover: {
+    y: -5,
+    transition: {
+      type: 'spring',
+      stiffness: 300,
+    },
+  },
+};
 
 
 const Dashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [history, setHistory] = useState([]);
+  const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
@@ -111,22 +147,26 @@ const Dashboard = () => {
   const exams = ["ESIC", "RRB Nursing", "NORCET", "NHM", "CHO", "UPPSC", "KGMU", "SGPGI", "MNS","PGI"];
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await api.get('/quiz/history');
-        setHistory(data);
+        const [historyRes, reportRes] = await Promise.all([
+          api.get('/quiz/history'),
+          api.get('/quiz/report')
+        ]);
+        setHistory(historyRes.data);
+        setReportData(reportRes.data);
       } catch (err) {
         if (err.response && err.response.status === 401) {
           logout();
         } else {
           console.error(err);
-          setError('Failed to load quiz history. Please try again later.');
+          setError('Failed to load dashboard data. Please try again later.');
         }
       } finally {
         setIsLoading(false);
       }
     };
-    fetchHistory();
+    fetchData();
   }, []);
 
   const chartData = Array.isArray(history) ? history.slice().reverse().map(attempt => ({
@@ -154,6 +194,12 @@ const Dashboard = () => {
       value: (Array.isArray(history) && history.length > 0 ? ((history[0].score / (history[0].totalQuestions || 1)) * 100).toFixed(1) : 0) + '%',
       icon: EmojiEvents,
       color: amber[600],
+    },
+    {
+      label: 'Achievements',
+      value: reportData?.student?.achievements?.length || 0,
+      icon: EmojiEvents,
+      color: purple[600],
     },
   ];
 
@@ -204,7 +250,7 @@ const Dashboard = () => {
               <Tab icon={<DashboardIcon />} label="Dashboard" />
               <Tab icon={<MenuBook />} label="Study Material" />
               <Tab icon={<History />} label="My Performance" />
-              <Tab icon={<EmojiEvents />} label="Certificates" />
+              <Tab icon={<EmojiEvents />} label="Achievements" />
             </Tabs>
 
             <Box sx={{ display: { xs: 'none', md: 'block' }, mr: 4 }}>
@@ -301,10 +347,10 @@ const Dashboard = () => {
               <Button
                 fullWidth
                 startIcon={<EmojiEvents />}
-                onClick={() => { setActiveTab(4); setMobileMenuOpen(false); }}
+                onClick={() => { setActiveTab(3); setMobileMenuOpen(false); }}
                 sx={{ justifyContent: 'flex-start', mb: 1 }}
               >
-                Certificates
+                Achievements
               </Button>
               <Button
                 fullWidth
@@ -320,182 +366,392 @@ const Dashboard = () => {
 
           {/* Content */}
           <Container maxWidth="xl" sx={{ py: 4 }}>
-            <Fade in={true} timeout={1000}>
-              <Box>
-                {/* Welcome Section */}
-                <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: { xs: 'center', md: 'left' }, px: { xs: 2, md: 0 } }}>
-                  <Chip label="Student Dashboard" color="primary" variant="outlined" sx={{ mb: 2 }} />
-                  <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
-                    Welcome back, {user?.name?.split(' ')[0] || 'User'}!
-                  </Typography>
-                  <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1.1rem', md: '1.25rem' }, maxWidth: { xs: '100%', md: '80%' } }}>
-                    You've completed {Array.isArray(history) ? history.length : 0} exams. Your performance is looking great!
-                  </Typography>
-                </Box>
-
-                {/* Stats Grid */}
-                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 6 }}>
-                  {stats.map((stat, index) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                      <Card
-                        sx={{
-                          p: { xs: 2, md: 3 },
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: { xs: 2, md: 3 },
-                          transition: 'transform 0.2s',
-                          '&:hover': { transform: 'translateY(-4px)' },
-                        }}
-                      >
-                        <Avatar sx={{ bgcolor: stat.color, width: { xs: 48, md: 56 }, height: { xs: 48, md: 56 } }}>
-                          <stat.icon fontSize={isMobile ? "small" : "medium"} />
-                        </Avatar>
-                        <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: { xs: '0.7rem', md: '0.8rem' } }}>
-                            {stat.label}
-                          </Typography>
-                          <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 0.5, fontSize: { xs: '1.5rem', md: '2.125rem' } }}>
-                            {stat.value}
-                          </Typography>
-                        </Box>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
-
-                {/* Analytics and Quick Actions */}
-                <Grid container spacing={{ xs: 3, md: 4 }}>
-                  <Grid size={{ xs: 12, lg: 8 }}>
-                    {/* Performance Chart */}
-                    <Card sx={{ p: { xs: 2, md: 3 }, mb: 4 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
-                        <Box>
-                          <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
-                            Performance Analytics
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
-                            Track your academic growth over time
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
-                          <Button variant="contained" size="small" fullWidth={isMobile}>
-                            Score Trend
-                          </Button>
-                          <Button variant="outlined" size="small" fullWidth={isMobile}>
-                            Time Trend
-                          </Button>
-                        </Box>
-                      </Box>
-                      <Box sx={{ height: { xs: 250, sm: 300 }, width: '100%', minWidth: 0, minHeight: 250 }}>
-                        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                          <LineChart data={chartData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                            <XAxis dataKey="date" stroke="#64748b" fontSize={12} />
-                            <YAxis stroke="#64748b" fontSize={12} />
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                              }}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="score"
-                              stroke={blue[600]}
-                              strokeWidth={3}
-                              dot={{ fill: blue[600], strokeWidth: 2, r: 6 }}
-                              activeDot={{ r: 8, stroke: blue[600], strokeWidth: 2, fill: 'white' }}
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </Box>
-                    </Card>
-
-                    {/* Quick Actions */}
-                    <Card sx={{ p: { xs: 2, md: 3 } }}>
-                      <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
-                        Quick Actions
+            <AnimatePresence mode="wait">
+              <Box key={activeTab}>
+                {activeTab === 0 && (
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    exit={{ opacity: 0, y: -20 }}
+                    variants={containerVariants}
+                  >
+                    {/* Welcome Section */}
+                    <Box 
+                      component={motion.div}
+                      variants={itemVariants}
+                      sx={{ mb: { xs: 4, md: 6 }, textAlign: { xs: 'center', md: 'left' }, px: { xs: 2, md: 0 } }}
+                    >
+                      <Chip label="Student Dashboard" color="primary" variant="outlined" sx={{ mb: 2 }} />
+                      <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
+                        <TypingEffect text={`Welcome back, ${user?.name?.split(' ')[0] || 'User'}!`} speed={50} />
                       </Typography>
-                      <Grid container spacing={2}>
-                        {exams.map((exam, index) => (
-                          <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                              <Button
-                                fullWidth
-                                variant="outlined"
-                                onClick={() => navigate(`/quiz/${exam}`)}
-                                sx={{
-                                  p: { xs: 2, md: 3 },
-                                  justifyContent: 'flex-start',
-                                  borderRadius: 2,
-                                  textTransform: 'none',
-                                  '&:hover': { bgcolor: 'primary.light', color: 'white' },
-                                }}
-                                startIcon={
-                                  <Avatar sx={{ bgcolor: 'primary.main', width: { xs: 32, md: 40 }, height: { xs: 32, md: 40 } }}>
-                                    {exam.charAt(0)}
-                                  </Avatar>
-                                }
-                              >
-                                <Box sx={{ textAlign: 'left' }}>
-                                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: { xs: '0.875rem', md: '1rem' } }}>
-                                    {exam}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
-                                    Start Practice
-                                  </Typography>
-                                </Box>
-                              </Button>
-                              <Button
-                                fullWidth
-                                variant="contained"
-                                onClick={() => navigate(`/game-quiz/${exam}`)}
-                                sx={{
-                                  p: { xs: 1.5, md: 2.5 },
-                                  justifyContent: 'flex-start',
-                                  borderRadius: 2,
-                                  textTransform: 'none',
-                                  bgcolor: 'secondary.main',
-                                  '&:hover': { bgcolor: 'secondary.dark' },
-                                }}
-                                startIcon={
-                                  <Avatar sx={{ bgcolor: 'secondary.dark', width: { xs: 28, md: 36 }, height: { xs: 28, md: 36 } }}>
-                                    <EmojiEvents fontSize="small" />
-                                  </Avatar>
-                                }
-                              >
-                                <Box sx={{ textAlign: 'left' }}>
-                                  <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
-                                    Game Mode
-                                  </Typography>
-                                  <Typography variant="caption" color="rgba(255,255,255,0.8)" sx={{ fontSize: { xs: '0.6rem', md: '0.7rem' } }}>
-                                    Fun & Points
-                                  </Typography>
-                                </Box>
-                              </Button>
+                      <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', sm: '1.1rem', md: '1.25rem' }, maxWidth: { xs: '100%', md: '80%' } }}>
+                        You've completed {Array.isArray(history) ? history.length : 0} exams. Your performance is looking great!
+                      </Typography>
+                    </Box>
+
+                    {/* Stats Grid */}
+                    <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 6 }}>
+                      {stats.map((stat, index) => (
+                        <Grid 
+                          size={{ xs: 12, sm: 6, md: 4 }} 
+                          key={index}
+                        >
+                          <ScrollIn delay={index * 0.1}>
+                            <Card
+                              component={motion.div}
+                              whileHover={{ y: -5 }}
+                              sx={{
+                                p: { xs: 2, md: 3 },
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: { xs: 2, md: 3 },
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                                border: '1px solid',
+                                borderColor: 'grey.100',
+                              }}
+                            >
+                              <Avatar sx={{ bgcolor: stat.color, width: { xs: 48, md: 56 }, height: { xs: 48, md: 56 } }}>
+                                <stat.icon fontSize={isMobile ? "small" : "medium"} />
+                              </Avatar>
+                              <Box>
+                                <Typography variant="body2" color="text.secondary" sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: { xs: '0.7rem', md: '0.8rem' } }}>
+                                  {stat.label}
+                                </Typography>
+                                <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 0.5, fontSize: { xs: '1.5rem', md: '2.125rem' } }}>
+                                  {stat.value}
+                                </Typography>
+                              </Box>
+                            </Card>
+                          </ScrollIn>
+                        </Grid>
+                      ))}
+                    </Grid>
+
+                    {/* Analytics and Quick Actions */}
+                    <Grid container spacing={{ xs: 3, md: 4 }}>
+                      <Grid size={{ xs: 12, lg: 8 }}>
+                        {/* Performance Chart */}
+                        <ScrollIn direction="left">
+                          <Card 
+                            sx={{ p: { xs: 2, md: 3 }, mb: 4 }}
+                          >
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
+                              <Box>
+                                <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                  Performance Analytics
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
+                                  Track your academic growth over time
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+                                <Button variant="contained" size="small" fullWidth={isMobile}>
+                                  Score Trend
+                                </Button>
+                                <Button variant="outlined" size="small" fullWidth={isMobile}>
+                                  Time Trend
+                                </Button>
+                              </Box>
                             </Box>
+                            <Box sx={{ height: { xs: 250, sm: 300 }, width: '100%', minWidth: 0, minHeight: 250 }}>
+                              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                                <LineChart data={chartData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                                  <XAxis dataKey="date" stroke="#64748b" fontSize={12} />
+                                  <YAxis stroke="#64748b" fontSize={12} />
+                                  <Tooltip
+                                    contentStyle={{
+                                      backgroundColor: 'white',
+                                      border: 'none',
+                                      borderRadius: '8px',
+                                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    }}
+                                  />
+                                  <Line
+                                    type="monotone"
+                                    dataKey="score"
+                                    stroke={blue[600]}
+                                    strokeWidth={3}
+                                    dot={{ fill: blue[600], strokeWidth: 2, r: 6 }}
+                                    activeDot={{ r: 8, stroke: blue[600], strokeWidth: 2, fill: 'white' }}
+                                  />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            </Box>
+                          </Card>
+                        </ScrollIn>
+
+                        {/* Quick Actions */}
+                        <ScrollIn direction="up">
+                          <Card 
+                            sx={{ p: { xs: 2, md: 3 } }}
+                          >
+                            <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                              Quick Actions
+                            </Typography>
+                            <Grid 
+                              container 
+                              spacing={2}
+                            >
+                              {exams.map((exam, index) => (
+                                <Grid 
+                                  size={{ xs: 12, sm: 6 }} 
+                                  key={index}
+                                >
+                                  <ScrollIn delay={index * 0.05} direction="up">
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                      <Button
+                                        fullWidth
+                                        variant="outlined"
+                                        onClick={() => navigate(`/quiz/${exam}`)}
+                                        sx={{
+                                          p: { xs: 2, md: 3 },
+                                          justifyContent: 'flex-start',
+                                          borderRadius: 2,
+                                          textTransform: 'none',
+                                          '&:hover': { bgcolor: 'primary.light', color: 'white' },
+                                        }}
+                                        startIcon={
+                                          <Avatar sx={{ bgcolor: 'primary.main', width: { xs: 32, md: 40 }, height: { xs: 32, md: 40 } }}>
+                                            {exam.charAt(0)}
+                                          </Avatar>
+                                        }
+                                      >
+                                        <Box sx={{ textAlign: 'left' }}>
+                                          <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: { xs: '0.875rem', md: '1rem' } }}>
+                                            {exam}
+                                          </Typography>
+                                          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
+                                            Start Practice
+                                          </Typography>
+                                        </Box>
+                                      </Button>
+                                      <Button
+                                        fullWidth
+                                        variant="contained"
+                                        onClick={() => navigate(`/game-quiz/${exam}`)}
+                                        sx={{
+                                          p: { xs: 1.5, md: 2.5 },
+                                          justifyContent: 'flex-start',
+                                          borderRadius: 2,
+                                          textTransform: 'none',
+                                          bgcolor: 'secondary.main',
+                                          '&:hover': { bgcolor: 'secondary.dark' },
+                                        }}
+                                        startIcon={
+                                          <Avatar sx={{ bgcolor: 'secondary.dark', width: { xs: 28, md: 36 }, height: { xs: 28, md: 36 } }}>
+                                            <EmojiEvents fontSize="small" />
+                                          </Avatar>
+                                        }
+                                      >
+                                        <Box sx={{ textAlign: 'left' }}>
+                                          <Typography variant="body2" sx={{ fontWeight: 'bold', fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
+                                            Game Mode
+                                          </Typography>
+                                          <Typography variant="caption" color="rgba(255,255,255,0.8)" sx={{ fontSize: { xs: '0.6rem', md: '0.7rem' } }}>
+                                            Fun & Points
+                                          </Typography>
+                                        </Box>
+                                      </Button>
+                                    </Box>
+                                  </ScrollIn>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </Card>
+                        </ScrollIn>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, lg: 4 }}>
+                        <ScrollIn direction="right">
+                          <Card 
+                            sx={{ p: { xs: 2, md: 3 }, mb: 4 }}
+                          >
+                            <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                              Recent Activity
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
+                              Your recent quiz attempts and study progress.
+                            </Typography>
+                          </Card>
+                        </ScrollIn>
+
+                        <ScrollIn direction="right" delay={0.2}>
+                          <Card 
+                            sx={{ p: { xs: 2, md: 3 } }}
+                          >
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                              <Typography variant="h6" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                Achievements
+                              </Typography>
+                              <Chip 
+                                label={`${reportData?.student?.achievements?.length || 0} Earned`} 
+                                size="small" 
+                                color="secondary" 
+                              />
+                            </Box>
+                            
+                            {reportData?.student?.achievements && reportData.student.achievements.length > 0 ? (
+                              <Box 
+                                sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                              >
+                                {reportData.student.achievements.slice(0, 5).map((achievement, index) => (
+                                  <ScrollIn key={index} delay={index * 0.1} direction="up">
+                                    <Box 
+                                      sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+                                    >
+                                      <Avatar sx={{ bgcolor: 'amber.50', color: 'amber.700', border: '1px solid', borderColor: 'amber.200' }}>
+                                        {achievement.icon || '🏆'}
+                                      </Avatar>
+                                      <Box>
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                          {achievement.title}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                          {achievement.description}
+                                        </Typography>
+                                      </Box>
+                                    </Box>
+                                  </ScrollIn>
+                                ))}
+                                {reportData.student.achievements.length > 5 && (
+                                  <Button size="small" variant="text" fullWidth onClick={() => setActiveTab(2)}>
+                                    View All Achievements
+                                  </Button>
+                                )}
+                              </Box>
+                            ) : (
+                              <Box sx={{ textAlign: 'center', py: 4 }}>
+                                <EmojiEvents sx={{ fontSize: 48, color: 'grey.300', mb: 1 }} />
+                                <Typography variant="body2" color="text.secondary">
+                                  Complete quizzes to earn achievements!
+                                </Typography>
+                              </Box>
+                            )}
+                          </Card>
+                        </ScrollIn>
+                      </Grid>
+                    </Grid>
+                  </motion.div>
+                )}
+
+                {activeTab === 2 && (
+                  <motion.div
+                    key="performance"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card sx={{ p: 2 }}>
+                      <ReportCard data={reportData} />
+                    </Card>
+                  </motion.div>
+                )}
+
+                {activeTab === 1 && (
+                  <motion.div
+                    key="study"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Box sx={{ p: 4, textAlign: 'center' }}>
+                      <Typography variant="h5">Study Material coming soon...</Typography>
+                    </Box>
+                  </motion.div>
+                )}
+
+                {activeTab === 3 && (
+                  <motion.div
+                    key="achievements"
+                    initial="hidden"
+                    animate="visible"
+                    exit={{ opacity: 0, y: 20 }}
+                    variants={containerVariants}
+                    sx={{ py: 4 }}
+                  >
+                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+                      Your Achievements & Certificates
+                    </Typography>
+                    {reportData?.student?.achievements && reportData.student.achievements.length > 0 ? (
+                      <Grid container spacing={3}>
+                        {reportData.student.achievements.map((achievement, index) => (
+                          <Grid 
+                            size={{ xs: 12, sm: 6, md: 4 }} 
+                            key={index}
+                            component={motion.div}
+                            variants={itemVariants}
+                            whileHover={{ y: -10 }}
+                          >
+                            <Card sx={{ 
+                              height: '100%', 
+                              display: 'flex', 
+                              flexDirection: 'column', 
+                              alignItems: 'center', 
+                              p: 3,
+                              textAlign: 'center',
+                              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                              border: '1px solid',
+                              borderColor: 'grey.200'
+                            }}>
+                              <Avatar sx={{ 
+                                width: 80, 
+                                height: 80, 
+                                bgcolor: 'amber.50', 
+                                color: 'amber.700', 
+                                mb: 2,
+                                fontSize: '2.5rem',
+                                border: '2px solid',
+                                borderColor: 'amber.200'
+                              }}>
+                                {achievement.icon || '🏆'}
+                              </Avatar>
+                              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                {achievement.title}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                {achievement.description}
+                              </Typography>
+                              <Box sx={{ mt: 'auto' }}>
+                                <Chip 
+                                  label={`Earned on ${new Date(achievement.earnedAt).toLocaleDateString()}`}
+                                  size="small"
+                                  variant="outlined"
+                                />
+                              </Box>
+                            </Card>
                           </Grid>
                         ))}
                       </Grid>
-                    </Card>
-                  </Grid>
-
-                  {/* Sidebar Content Placeholder */}
-                  <Grid size={{ xs: 12, lg: 4 }}>
-                    <Card sx={{ p: { xs: 2, md: 3 } }}>
-                      <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
-                        Recent Activity
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
-                        Your recent quiz attempts and achievements will appear here.
-                      </Typography>
-                    </Card>
-                  </Grid>
-                </Grid>
+                    ) : (
+                      <Paper 
+                        sx={{ p: 8, textAlign: 'center', borderRadius: 4 }}
+                        component={motion.div}
+                        variants={itemVariants}
+                      >
+                        <EmojiEvents sx={{ fontSize: 100, color: 'grey.200', mb: 2 }} />
+                        <Typography variant="h5" color="text.secondary" gutterBottom>
+                          No achievements yet
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                          Keep practicing and completing exams to unlock prestigious badges!
+                        </Typography>
+                        <Button 
+                          variant="contained" 
+                          sx={{ mt: 4 }} 
+                          onClick={() => setActiveTab(0)}
+                        >
+                          Start Your First Exam
+                        </Button>
+                      </Paper>
+                    )}
+                  </motion.div>
+                )}
               </Box>
-            </Fade>
+            </AnimatePresence>
           </Container>
         </Box>
     </ThemeProvider>

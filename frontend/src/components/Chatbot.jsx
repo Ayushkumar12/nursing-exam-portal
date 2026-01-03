@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../api/axios';
+import TypingEffect from './ui/TypingEffect';
 import {
   Box,
   Paper,
@@ -201,7 +202,11 @@ const Chatbot = () => {
                           lineHeight: 1.5
                         }}
                       >
-                        {msg.content}
+                        {msg.role === 'assistant' && index === messages.length - 1 ? (
+                          <TypingEffect text={msg.content} speed={20} />
+                        ) : (
+                          msg.content
+                        )}
                       </Paper>
                     </Box>
                   </Fade>

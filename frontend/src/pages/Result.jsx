@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import Confetti from 'react-confetti';
+import { motion, AnimatePresence } from 'framer-motion';
+import api from '../api/axios';
+import TypingEffect from '../components/ui/TypingEffect';
+import ScrollIn from '../components/ui/ScrollIn';
 import {
   ThemeProvider,
   createTheme,
@@ -25,6 +30,7 @@ import {
   AppBar,
   Toolbar,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 import {
   Dashboard,
@@ -39,6 +45,7 @@ import {
   Download,
   Share,
   ExpandMore as ExpandMoreIcon,
+  Celebration,
 } from '@mui/icons-material';
 import { blue, green, amber, red, grey } from '@mui/material/colors';
 
@@ -93,6 +100,47 @@ const theme = createTheme({
 const Result = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [careerInsight, setCareerInsight] = useState('Analyzing your response patterns...');
+  const [loadingInsight, setLoadingInsight] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    
+    if (state?.newAchievements && state.newAchievements.length > 0) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 8000);
+    }
+
+    // Fetch AI Career Insight
+    const fetchInsight = async () => {
+      if (state?.attempt?._id) {
+        setLoadingInsight(true);
+        try {
+          const { data } = await api.post('/ai/career-insight', { attemptId: state.attempt._id });
+          setCareerInsight(data.insight);
+        } catch (error) {
+          console.error('Error fetching career insight:', error);
+          setCareerInsight('Failed to generate insight at this moment. Focus on your strong areas!');
+        } finally {
+          setLoadingInsight(false);
+        }
+      }
+    };
+    fetchInsight();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [state]);
 
   if (!state) {
     return (
@@ -131,7 +179,7 @@ const Result = () => {
     );
   }
 
-  const { attempt, questions, gameMode, gameStats } = state;
+  const { attempt, questions, gameMode, gameStats, newAchievements } = state;
   const percentage = (attempt.score / attempt.totalQuestions) * 100;
 
   const chartData = [
@@ -174,6 +222,7 @@ const Result = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      {showConfetti && <Confetti width={windowSize.width} height={windowSize.height} recycle={false} numberOfPieces={500} />}
       <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
         {/* Header */}
         <AppBar position="static" elevation={1} sx={{ bgcolor: 'white', color: 'text.primary' }}>
@@ -255,7 +304,7 @@ const Result = () => {
                       }}
                     />
                     <Typography variant="h3" gutterBottom sx={{ fontWeight: 'bold', fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
-                      Knowledge <span style={{ color: blue[600] }}>Verification</span> Complete
+                      Knowledge <span style={{ color: blue[600] }}>Verification</span> <TypingEffect text="Complete" speed={100} />
                     </Typography>
                     <Typography variant="h6" color="text.secondary" sx={{ mb: 3, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                       {message.sub}
@@ -282,6 +331,93 @@ const Result = () => {
                   </Box>
                 </Card>
               </Fade>
+              
+              {/* Newly Earned Achievements */}
+              {newAchievements && newAchievements.length > 0 && (
+                <Box sx={{ mb: 6 }}>
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                  >
+                    <Card sx={{ 
+                      p: { xs: 3, sm: 6 }, 
+                      textAlign: 'center',
+                      background: 'linear-gradient(135deg, #FFF9C4 0%, #FFFDE7 100%)',
+                      border: '3px solid',
+                      borderColor: '#FFD700',
+                      position: 'relative',
+                      overflow: 'visible'
+                    }}>
+                      <motion.div
+                        animate={{ 
+                          rotate: [0, -10, 10, -10, 10, 0],
+                          y: [0, -20, 0]
+                        }}
+                        transition={{ 
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatType: "loop"
+                        }}
+                        style={{ marginBottom: '24px' }}
+                      >
+                        <EmojiEvents sx={{ fontSize: 120, color: '#FFD700', filter: 'drop-shadow(0 0 20px rgba(255, 215, 0, 0.5))' }} />
+                      </motion.div>
+
+                      <Typography variant="h3" sx={{ fontWeight: 'black', color: '#856404', mb: 2, textTransform: 'uppercase', letterSpacing: 2 }}>
+                        New Achievement Unlocked!
+                      </Typography>
+                      
+                      <Typography variant="h6" sx={{ color: '#856404', mb: 4, opacity: 0.8 }}>
+                        You're on fire! Your dedication is truly impressive.
+                      </Typography>
+
+                      <Grid container spacing={3} justifyContent="center">
+                        {newAchievements.map((achievement, index) => (
+                          <Grid size={{ xs: 12, sm: 6 }} key={index}>
+                            <motion.div
+                              initial={{ x: -50, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: index * 0.2 + 0.5 }}
+                            >
+                              <Paper sx={{ 
+                                p: 3, 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 3, 
+                                bgcolor: 'white',
+                                borderRadius: 4,
+                                boxShadow: '0 8px 32px rgba(133, 100, 4, 0.1)',
+                                border: '1px solid',
+                                borderColor: 'amber.100'
+                              }}>
+                                <Avatar sx={{ 
+                                  bgcolor: '#FFD700', 
+                                  color: 'white',
+                                  width: 64,
+                                  height: 64,
+                                  fontSize: '2rem',
+                                  boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)'
+                                }}>
+                                  {achievement.icon || '🏆'}
+                                </Avatar>
+                                <Box sx={{ textAlign: 'left' }}>
+                                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#856404' }}>
+                                    {achievement.title}
+                                  </Typography>
+                                  <Typography variant="body1" color="text.secondary">
+                                    {achievement.description}
+                                  </Typography>
+                                </Box>
+                              </Paper>
+                            </motion.div>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Card>
+                  </motion.div>
+                </Box>
+              )}
 
               {/* Game Stats (if game mode) */}
               {gameMode && gameStats && (
@@ -473,7 +609,14 @@ const Result = () => {
                     Specialization Path
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    Analyzing your response patterns... You show high proficiency in Acute Care logic. Consider focusing on Cardiovascular modules.
+                    {loadingInsight ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CircularProgress size={16} color="inherit" />
+                        Generating personalized insight...
+                      </Box>
+                    ) : (
+                      <TypingEffect text={careerInsight} speed={20} />
+                    )}
                   </Typography>
                 </Paper>
               </Card>

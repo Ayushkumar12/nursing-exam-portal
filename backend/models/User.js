@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['student', 'admin'], default: 'student' },
+  achievements: [{
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    icon: { type: String },
+    earnedAt: { type: Date, default: Date.now }
+  }],
   createdAt: { type: Date, default: Date.now }
 });
 

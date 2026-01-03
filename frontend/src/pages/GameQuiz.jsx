@@ -238,7 +238,15 @@ const GameQuiz = () => {
 
     try {
       const { data } = await api.post('/quiz/submit', { exam, responses: formattedResponses });
-      navigate('/result', { state: { attempt: data, questions, gameMode: true, gameStats: { score, points, level, streak } } });
+      navigate('/result', { 
+        state: { 
+          attempt: data.attempt, 
+          questions, 
+          gameMode: true, 
+          gameStats: { score, points, level, streak },
+          newAchievements: data.newAchievements
+        } 
+      });
     } catch (err) {
       console.error(err);
     }

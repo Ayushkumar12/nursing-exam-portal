@@ -13,6 +13,7 @@ import {
   Delete as DeleteIcon, Logout, Person, Menu, Close, Home as HomeIcon, People as UsersIcon, Description as FileTextIcon, TrendingUp as TrendingUpIcon, Add as PlusCircleIcon, VerifiedUser as ShieldCheckIcon, GpsFixed as TargetIcon, Timeline as ActivityIcon, EmojiEvents as AwardIcon, Download, Visibility,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReportCard from '../components/ReportCard';
 
 const AdminPanel = () => {
   const theme = useTheme();
@@ -589,58 +590,11 @@ const AdminPanel = () => {
             </Button>
           )}
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ p: 0 }}>
           {selectedStudentReport ? (
-            <Box>
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', borderRadius: 3 }}>
-                    <Typography variant="caption" color="text.secondary">Total Attempts</Typography>
-                    <Typography variant="h5" fontWeight={700}>{selectedStudentReport.stats.totalAttempts}</Typography>
-                  </Paper>
-                </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', borderRadius: 3 }}>
-                    <Typography variant="caption" color="text.secondary">Average Score</Typography>
-                    <Typography variant="h5" fontWeight={700} color="primary">{selectedStudentReport.stats.averageScore.toFixed(2)}%</Typography>
-                  </Paper>
-                </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', borderRadius: 3 }}>
-                    <Typography variant="caption" color="text.secondary">Highest Score</Typography>
-                    <Typography variant="h5" fontWeight={700} color="success.main">{selectedStudentReport.stats.highestScore.toFixed(2)}%</Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-
-              <Typography variant="subtitle1" fontWeight={700} gutterBottom>Recent Attempts</Typography>
-              <List>
-                {selectedStudentReport.attempts.length > 0 ? (
-                  selectedStudentReport.attempts.map((attempt) => (
-                    <ListItem key={attempt._id} divider>
-                      <ListItemText 
-                        primary={attempt.exam} 
-                        secondary={new Date(attempt.date).toLocaleString()} 
-                      />
-                      <Box sx={{ textAlign: 'right' }}>
-                        <Typography variant="h6" fontWeight={700} color={(attempt.score / attempt.totalQuestions * 100) >= 50 ? 'success.main' : 'error.main'}>
-                          {((attempt.score / attempt.totalQuestions) * 100).toFixed(2)}%
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {attempt.score}/{attempt.totalQuestions} Questions
-                        </Typography>
-                      </Box>
-                    </ListItem>
-                  ))
-                ) : (
-                  <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-                    No attempts recorded yet.
-                  </Typography>
-                )}
-              </List>
-            </Box>
+            <ReportCard data={selectedStudentReport} />
           ) : (
-            <Box sx={{ py: 5, textAlign: 'center' }}><CircularProgress /></Box>
+            <Box sx={{ py: 10, textAlign: 'center' }}><CircularProgress /></Box>
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>

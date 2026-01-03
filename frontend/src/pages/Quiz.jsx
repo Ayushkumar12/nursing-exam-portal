@@ -173,7 +173,13 @@ const Quiz = () => {
 
     try {
       const { data } = await api.post('/quiz/submit', { exam, responses: formattedResponses });
-      navigate('/result', { state: { attempt: data, questions } });
+      navigate('/result', { 
+        state: { 
+          attempt: data.attempt, 
+          questions,
+          newAchievements: data.newAchievements 
+        } 
+      });
     } catch (err) {
       console.error(err);
     }

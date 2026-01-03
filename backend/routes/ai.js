@@ -5,10 +5,57 @@ const { auth } = require('../middleware/authMiddleware');
 const Attempt = require('../models/Attempt');
 const User = require('../models/User');
 const Chat = require('../models/Chat');
+const Question = require('../models/Question');
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+router.post('/career-insight', auth, async (req, res) => {
+  try {
+    const { attemptId } = req.body;
+    const attempt = await Attempt.findById(attemptId).populate('responses.questionId');
+    
+    if (!attempt) {
+      return res.status(404).json({ error: 'Attempt not found' });
+    }
+
+    // Group correct/incorrect by topic
+    const topicPerformance = {};
+    attempt.responses.forEach(resp => {
+      const topic = resp.questionId?.topic || 'General';
+      if (!topicPerformance[topic]) {
+        topicPerformance[topic] = { correct: 0, total: 0 };
+      }
+      topicPerformance[topic].total++;
+      if (resp.isCorrect) {
+        topicPerformance[topic].correct++;
+      }
+    });
+
+    const performanceSummary = Object.entries(topicPerformance)
+      .map(([topic, stats]) => `${topic}: ${stats.correct}/${stats.total}`)
+      .join(', ');
+
+    const prompt = `As an expert nursing career counselor, analyze this student's exam performance:
+    Exam: ${attempt.exam}
+    Total Score: ${attempt.score}/${attempt.totalQuestions}
+    Topic-wise Performance: ${performanceSummary}
+    
+    Provide a professional AI Career Insight (max 2-3 sentences).
+    1. Identify a potential nursing specialization they might excel in based on their strong topics.
+    2. Provide one specific, actionable advice for their career or study path.
+    Keep the tone encouraging, professional, and clear. Do not use any markdown formatting like bold or tables, just plain text.`;
+
+    const result = await model.generateContent(prompt);
+    const insight = result.response.text();
+
+    res.json({ insight });
+  } catch (error) {
+    console.error('Career Insight Error:', error);
+    res.status(500).json({ error: 'Failed to generate career insight' });
+  }
+});
 
 router.post('/chat', auth, async (req, res) => {
   try {
@@ -44,16 +91,19 @@ Student Information:
 - Name: ${user.name}
 - Current Focus: Nursing Exam Preparation
 
-Recent Exam Performance:
-${performanceSummary}
+Rules for your responses:
+1. DO NOT show any tables in your response.
+2. Show only what the student asked for to ensure simple understanding.
+3. Keep the language simple, clear, and encouraging.
+4. Provide short, easy-to-understand summaries.
+5. ONLY show or discuss the "Recent Exam Performance" if the student explicitly asks about their results, performance, or scores.
 
 When the student asks about their results or performance:
-1. Provide a short, easy-to-understand summary.
+1. Provide a short, easy-to-understand summary of the performance data provided above.
 2. Highlight their strengths and areas for improvement.
-3. Keep the language simple and encouraging.
-4. If they haven't taken any exams, encourage them to start a practice test.
+3. If they haven't taken any exams, encourage them to start a practice test.
 
-Use the student's name and previous performance to personalize your responses. If they are struggling in certain areas, provide extra guidance and encouragement.
+Use the student's name to personalize your responses. If they are struggling in certain areas based on the performance data, provide extra guidance and encouragement only when relevant to their questions.
 If a question is outside the medical scope or is inappropriate, politely redirect the student to relevant medical topics.`;
 
     // Prepare history for Gemini
@@ -85,6 +135,14 @@ If a question is outside the medical scope or is inappropriate, politely redirec
     res.json({ reply });
   } catch (error) {
     console.error('Gemini AI Chat Error:', error);
+    
+    // Check for specific API key suspension or invalid key errors
+    if (error.status === 403 || error.message?.includes('403') || error.message?.includes('suspended')) {
+      return res.status(403).json({ 
+        error: 'AI service is currently unavailable due to API key suspension. Please check your GEMINI_API_KEY configuration.' 
+      });
+    }
+    
     res.status(500).json({ error: 'Failed to get response from AI assistant' });
   }
 });
