@@ -52,6 +52,16 @@ const ACHIEVEMENTS = {
     description: 'Maintained a 9-day login streak!',
     icon: '🚀'
   },
+  FIFTEEN_DAY_STREAK: {
+    title: 'Elite Scholar',
+    description: 'Maintained a 15-day login streak!',
+    icon: '👑'
+  },
+  THIRTY_DAY_STREAK: {
+    title: 'Legendary Dedication',
+    description: 'Maintained a 30-day login streak!',
+    icon: '💎'
+  },
   CHAT_BEGINNER: {
     title: 'Curious Mind',
     description: 'Used the AI Tutor for the first time!',
@@ -61,7 +71,101 @@ const ACHIEVEMENTS = {
     title: 'AI Enthusiast',
     description: 'Asked 10 questions to the AI Tutor!',
     icon: '🧠'
-  }
+  },
+  NIGHT_OWL: {
+    title: 'Night Owl',
+    description: 'Completed an exam between 12 AM and 5 AM!',
+    icon: '🌙'
+  },
+  EARLY_BIRD: {
+    title: 'Early Bird',
+    description: 'Completed an exam between 5 AM and 8 AM!',
+    icon: '🌅'
+  },
+  WEEKEND_WARRIOR: {
+    title: 'Weekend Warrior',
+    description: 'Completed an exam on a Saturday or Sunday!',
+    icon: '📅'
+  },
+  MARATHONER: {
+    title: 'Marathoner',
+    description: 'Completed 3 or more exams in a single day!',
+    icon: '🏃'
+  },
+  IMPROVING: {
+    title: 'On the Rise',
+    description: 'Scored better in your current exam than the previous one!',
+    icon: '📈'
+  },
+  DIVERSE_LEARNER: {
+    title: 'Diverse Learner',
+    description: 'Completed exams in 3 different categories!',
+    icon: '🌐'
+  },
+  CENTURY_CLUB: {
+    title: 'Century Club',
+    description: 'Scored 100% on a full-length (100 question) exam!',
+    icon: '💯'
+  },
+  // --- Exam Count Milestones (10 more) ---
+  TWENTY_EXAMS: { title: 'Dedicated Learner', description: 'Completed 20 exams!', icon: '📚' },
+  FIFTY_EXAMS: { title: 'Study Machine', description: 'Completed 50 exams!', icon: '⚙️' },
+  HUNDRED_EXAMS: { title: 'Exam Century', description: 'Completed 100 exams!', icon: '🏅' },
+  TWO_HUNDRED_EXAMS: { title: 'Nursing Scholar', description: 'Completed 200 exams!', icon: '📜' },
+  FIVE_HUNDRED_EXAMS: { title: 'Knowledge Titan', description: 'Completed 500 exams!', icon: '🏛️' },
+  NHM_FAN: { title: 'NHM Aspirant', description: 'Completed 10 NHM exams!', icon: '🏥' },
+  CHO_FAN: { title: 'CHO Specialist', description: 'Completed 10 CHO exams!', icon: '👨‍⚕️' },
+  ESIC_FAN: { title: 'ESIC Warrior', description: 'Completed 10 ESIC exams!', icon: '🛡️' },
+  AIIMS_FAN: { title: 'AIIMS Elite', description: 'Completed 10 AIIMS exams!', icon: '✨' },
+  JIPMER_FAN: { title: 'JIPMER Pro', description: 'Completed 10 JIPMER exams!', icon: '💎' },
+
+  // --- Score Milestones (10 more) ---
+  THREE_PERFECT_SCORES: { title: 'Hat-trick', description: 'Achieved 3 perfect scores!', icon: '🎩' },
+  TEN_PERFECT_SCORES: { title: 'Perfect Ten', description: 'Achieved 10 perfect scores!', icon: '🌟' },
+  TWENTY_HIGH_SCORES: { title: 'Consistent Excellence', description: 'Scored 90% or higher in 20 exams!', icon: '📈' },
+  FIFTY_HIGH_SCORES: { title: 'Elite Performer', description: 'Scored 90% or higher in 50 exams!', icon: '🚀' },
+  TOTAL_SCORE_1000: { title: 'Point Collector', description: 'Accumulated 1,000 total correct answers!', icon: '💰' },
+  TOTAL_SCORE_5000: { title: 'Score Master', description: 'Accumulated 5,000 total correct answers!', icon: '💰' },
+  TOTAL_SCORE_10000: { title: 'Question Crusher', description: 'Accumulated 10,000 total correct answers!', icon: '💥' },
+  SMART_START: { title: 'Brilliant Beginning', description: 'Scored 100% on your very first exam!', icon: '💡' },
+  COMEBACK_KID: { title: 'Comeback Kid', description: 'Scored 90% after a previous score below 50%!', icon: '🔄' },
+  GOLDEN_MEAN: { title: 'Solid Foundation', description: 'Maintained an average score of 75% over 10 exams!', icon: '🧱' },
+
+  // --- Login & Streak Milestones (10 more) ---
+  SIXTY_DAY_STREAK: { title: 'Two-Month Commitment', description: 'Maintained a 60-day login streak!', icon: '📅' },
+  HUNDRED_DAY_STREAK: { title: 'Century Streak', description: 'Maintained a 100-day login streak!', icon: '💯' },
+  YEAR_STREAK: { title: 'Ultimate Dedicated', description: 'Maintained a 365-day login streak!', icon: '🌍' },
+  WEEKEND_WARRIOR_PLUS: { title: 'Weekend Devotion', description: 'Completed exams on 4 consecutive weekends!', icon: '🗓️' },
+  NIGHT_OWL_PRO: { title: 'Midnight Scholar', description: 'Completed 5 exams during midnight hours!', icon: '🧛' },
+  EARLY_BIRD_PRO: { title: 'Sunrise Success', description: 'Completed 5 exams during early morning hours!', icon: '🌅' },
+  LUNCH_BREAK_LEARNER: { title: 'Productive Lunch', description: 'Completed an exam between 12 PM and 2 PM!', icon: '🍱' },
+  AFTER_SCHOOL_STUDY: { title: 'Evening Diligence', description: 'Completed an exam between 4 PM and 7 PM!', icon: '🌆' },
+  HOLIDAY_HERO: { title: 'Holiday Hero', description: 'Completed an exam on New Year or Christmas!', icon: '🎄' },
+  STREAK_SAVER: { title: 'Consistency King', description: 'Maintained a streak for 14 days without missing!', icon: '🛡️' },
+
+  // --- AI Tutor & Interaction (10 more) ---
+  AI_FRIEND: { title: 'AI Explorer', description: 'Asked 25 questions to the AI Tutor!', icon: '🤖' },
+  AI_PARTNER: { title: 'AI Collaborator', description: 'Asked 50 questions to the AI Tutor!', icon: '🤝' },
+  AI_ADDICT: { title: 'AI Power User', description: 'Asked 100 questions to the AI Tutor!', icon: '⚡' },
+  KNOWLEDGE_SEEKER: { title: 'Knowledge Seeker', description: 'Used AI Tutor after failing a question!', icon: '🔍' },
+  DEEP_DIVE: { title: 'Deep Dive', description: 'Asked AI 5 questions in a single session!', icon: '🤿' },
+  QUICK_QUERY: { title: 'Quick Learner', description: 'Asked AI a question immediately after an exam!', icon: '⏱️' },
+  TOPIC_MASTERY_AI: { title: 'Topic Mastery', description: 'Asked about 5 different topics in AI Tutor!', icon: '🧠' },
+  AI_GUIDED: { title: 'AI Guided', description: 'Completed 5 exams after consulting the AI Tutor!', icon: '🗺️' },
+  BOT_BESTIE: { title: 'Bot Bestie', description: 'Used AI Tutor for 7 consecutive days!', icon: '🤖' },
+  WISDOM_WEAVER: { title: 'Wisdom Weaver', description: 'Asked a very long question to the AI Tutor!', icon: '🕸️' },
+
+  // --- Variety & Special (10 more) ---
+  JACK_OF_ALL_TRADES: { title: 'Jack of All Trades', description: 'Completed at least one exam from every category!', icon: '🃏' },
+  SPECIALIST: { title: 'Specialist', description: 'Completed 50 exams in a single category!', icon: '🎯' },
+  DIVERSE_PORTFOLIO: { title: 'Diverse Portfolio', description: 'Completed 5 different types of exams!', icon: '📂' },
+  REPEAT_CUSTOMER: { title: 'Perfectionist', description: 'Retook the same exam type 5 times!', icon: '🔁' },
+  EXAM_SPRINTER: { title: 'Exam Sprinter', description: 'Completed 2 exams within 30 minutes!', icon: '🏃‍♂️' },
+  LONG_HAUL: { title: 'Long Haul', description: 'Completed 10 exams in a single week!', icon: '🚛' },
+  STEADY_PROGRESS: { title: 'Steady Progress', description: 'Increased score in 3 consecutive exams!', icon: '📈' },
+  NO_STONE_UNTURNED: { title: 'No Stone Unturned', description: 'Attempted every available exam type!', icon: '💎' },
+  KNOWLEDGE_HUB: { title: 'Knowledge Hub', description: 'Earned 30 different achievements!', icon: '🏢' },
+  LEGENDARY_STATUS: { title: 'Legendary Status', description: 'Earned 50 different achievements!', icon: '👑' }
 };
 
 const checkAndAwardAchievements = async (userId) => {
@@ -69,7 +173,7 @@ const checkAndAwardAchievements = async (userId) => {
     const user = await User.findById(userId);
     if (!user) return [];
 
-    const attempts = await Attempt.find({ user: userId });
+    const attempts = await Attempt.find({ user: userId }).sort({ date: 1 });
     const newlyEarned = [];
 
     const hasAchievement = (title) => user.achievements.some(a => a.title === title);
@@ -129,6 +233,12 @@ const checkAndAwardAchievements = async (userId) => {
     if (user.loginStreak >= 9) {
       award(ACHIEVEMENTS.NINE_DAY_STREAK);
     }
+    if (user.loginStreak >= 15) {
+      award(ACHIEVEMENTS.FIFTEEN_DAY_STREAK);
+    }
+    if (user.loginStreak >= 30) {
+      award(ACHIEVEMENTS.THIRTY_DAY_STREAK);
+    }
 
     // 7. Chatbot Usage
     if (user.chatbotUsageCount >= 1) {
@@ -137,16 +247,189 @@ const checkAndAwardAchievements = async (userId) => {
     if (user.chatbotUsageCount >= 10) {
       award(ACHIEVEMENTS.CHAT_MASTER);
     }
+    
+    // 8. Performance and Time-based
+    if (attempts.length > 0) {
+      const latestAttempt = attempts[attempts.length - 1];
+      const hour = new Date(latestAttempt.date).getHours();
+      const day = new Date(latestAttempt.date).getDay();
+
+      // Night Owl (00:00 - 05:00)
+      if (hour >= 0 && hour < 5) {
+        award(ACHIEVEMENTS.NIGHT_OWL);
+      }
+
+      // Early Bird (05:00 - 08:00)
+      if (hour >= 5 && hour < 8) {
+        award(ACHIEVEMENTS.EARLY_BIRD);
+      }
+
+      // Weekend Warrior (Saturday or Sunday)
+      if (day === 0 || day === 6) {
+        award(ACHIEVEMENTS.WEEKEND_WARRIOR);
+      }
+
+      // Marathoner (3+ exams in a single day)
+      const today = new Date(latestAttempt.date).setHours(0,0,0,0);
+      const examsToday = attempts.filter(a => new Date(a.date).setHours(0,0,0,0) === today).length;
+      if (examsToday >= 3) {
+        award(ACHIEVEMENTS.MARATHONER);
+      }
+
+      // Improving (Better than previous)
+      if (attempts.length >= 2) {
+        const prevAttempt = attempts[attempts.length - 2];
+        const currentPercent = latestAttempt.score / latestAttempt.totalQuestions;
+        const prevPercent = prevAttempt.score / prevAttempt.totalQuestions;
+        if (currentPercent > prevPercent) {
+          award(ACHIEVEMENTS.IMPROVING);
+        }
+      }
+
+      // Diverse Learner (3 different exams)
+      const uniqueExams = new Set(attempts.map(a => a.exam)).size;
+      if (uniqueExams >= 3) {
+        award(ACHIEVEMENTS.DIVERSE_LEARNER);
+      }
+
+      // Century Club (100% on 100 question exam)
+      if (latestAttempt.totalQuestions >= 100 && (latestAttempt.score / latestAttempt.totalQuestions) === 1) {
+        award(ACHIEVEMENTS.CENTURY_CLUB);
+      }
+
+      // --- NEW LOGIC FOR 50 ACHIEVEMENTS ---
+
+      // Exam Count Milestones
+      if (attempts.length >= 20) award(ACHIEVEMENTS.TWENTY_EXAMS);
+      if (attempts.length >= 50) award(ACHIEVEMENTS.FIFTY_EXAMS);
+      if (attempts.length >= 100) award(ACHIEVEMENTS.HUNDRED_EXAMS);
+      if (attempts.length >= 200) award(ACHIEVEMENTS.TWO_HUNDRED_EXAMS);
+      if (attempts.length >= 500) award(ACHIEVEMENTS.FIVE_HUNDRED_EXAMS);
+
+      const nhmCount = attempts.filter(a => a.exam === 'NHM').length;
+      if (nhmCount >= 10) award(ACHIEVEMENTS.NHM_FAN);
+      const choCount = attempts.filter(a => a.exam === 'CHO').length;
+      if (choCount >= 10) award(ACHIEVEMENTS.CHO_FAN);
+      const esicCount = attempts.filter(a => a.exam === 'ESIC').length;
+      if (esicCount >= 10) award(ACHIEVEMENTS.ESIC_FAN);
+      const aiimsCount = attempts.filter(a => a.exam === 'AIIMS').length;
+      if (aiimsCount >= 10) award(ACHIEVEMENTS.AIIMS_FAN);
+      const jipmerCount = attempts.filter(a => a.exam === 'JIPMER').length;
+      if (jipmerCount >= 10) award(ACHIEVEMENTS.JIPMER_FAN);
+
+      // Score Milestones
+      const perfectScores = attempts.filter(a => (a.score / a.totalQuestions) === 1).length;
+      if (perfectScores >= 3) award(ACHIEVEMENTS.THREE_PERFECT_SCORES);
+      if (perfectScores >= 10) award(ACHIEVEMENTS.TEN_PERFECT_SCORES);
+
+      const highScores = attempts.filter(a => (a.score / a.totalQuestions) >= 0.9).length;
+      if (highScores >= 20) award(ACHIEVEMENTS.TWENTY_HIGH_SCORES);
+      if (highScores >= 50) award(ACHIEVEMENTS.FIFTY_HIGH_SCORES);
+
+      const totalCorrect = attempts.reduce((sum, a) => sum + a.score, 0);
+      if (totalCorrect >= 1000) award(ACHIEVEMENTS.TOTAL_SCORE_1000);
+      if (totalCorrect >= 5000) award(ACHIEVEMENTS.TOTAL_SCORE_5000);
+      if (totalCorrect >= 10000) award(ACHIEVEMENTS.TOTAL_SCORE_10000);
+
+      if (attempts.length === 1 && (attempts[0].score / attempts[0].totalQuestions) === 1) {
+        award(ACHIEVEMENTS.SMART_START);
+      }
+
+      if (attempts.length >= 2) {
+        const last = attempts[attempts.length - 1];
+        const prev = attempts[attempts.length - 2];
+        if ((last.score / last.totalQuestions) >= 0.9 && (prev.score / prev.totalQuestions) < 0.5) {
+          award(ACHIEVEMENTS.COMEBACK_KID);
+        }
+      }
+
+      if (attempts.length >= 10) {
+        const last10 = attempts.slice(-10);
+        const avg = last10.reduce((sum, a) => sum + (a.score / a.totalQuestions), 0) / 10;
+        if (avg >= 0.75) award(ACHIEVEMENTS.GOLDEN_MEAN);
+      }
+
+      // Login & Streaks
+      if (user.loginStreak >= 60) award(ACHIEVEMENTS.SIXTY_DAY_STREAK);
+      if (user.loginStreak >= 100) award(ACHIEVEMENTS.HUNDRED_DAY_STREAK);
+      if (user.loginStreak >= 365) award(ACHIEVEMENTS.YEAR_STREAK);
+      if (user.loginStreak >= 14) award(ACHIEVEMENTS.STREAK_SAVER);
+
+      const midnightExams = attempts.filter(a => {
+        const h = new Date(a.date).getHours();
+        return h >= 0 && h < 5;
+      }).length;
+      if (midnightExams >= 5) award(ACHIEVEMENTS.NIGHT_OWL_PRO);
+
+      const earlyExams = attempts.filter(a => {
+        const h = new Date(a.date).getHours();
+        return h >= 5 && h < 8;
+      }).length;
+      if (earlyExams >= 5) award(ACHIEVEMENTS.EARLY_BIRD_PRO);
+
+      if (hour >= 12 && hour < 14) award(ACHIEVEMENTS.LUNCH_BREAK_LEARNER);
+      if (hour >= 16 && hour < 19) award(ACHIEVEMENTS.AFTER_SCHOOL_STUDY);
+
+      const isHoliday = (new Date(latestAttempt.date).getMonth() === 11 && new Date(latestAttempt.date).getDate() === 25) || 
+                        (new Date(latestAttempt.date).getMonth() === 0 && new Date(latestAttempt.date).getDate() === 1);
+      if (isHoliday) award(ACHIEVEMENTS.HOLIDAY_HERO);
+
+      // AI Tutor
+      if (user.chatbotUsageCount >= 25) award(ACHIEVEMENTS.AI_FRIEND);
+      if (user.chatbotUsageCount >= 50) award(ACHIEVEMENTS.AI_PARTNER);
+      if (user.chatbotUsageCount >= 100) award(ACHIEVEMENTS.AI_ADDICT);
+
+      // Variety & Special
+      const examTypes = new Set(attempts.map(a => a.exam));
+      if (examTypes.size >= 5) award(ACHIEVEMENTS.DIVERSE_PORTFOLIO);
+      
+      const countsByExam = attempts.reduce((acc, a) => {
+        acc[a.exam] = (acc[a.exam] || 0) + 1;
+        return acc;
+      }, {});
+      if (Object.values(countsByExam).some(c => c >= 50)) award(ACHIEVEMENTS.SPECIALIST);
+      if (Object.values(countsByExam).some(c => c >= 5)) award(ACHIEVEMENTS.REPEAT_CUSTOMER);
+
+      if (attempts.length >= 2) {
+        const diff = new Date(attempts[attempts.length-1].date) - new Date(attempts[attempts.length-2].date);
+        if (diff < 30 * 60 * 1000) award(ACHIEVEMENTS.EXAM_SPRINTER);
+      }
+
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const examsThisWeek = attempts.filter(a => new Date(a.date) > oneWeekAgo).length;
+      if (examsThisWeek >= 10) award(ACHIEVEMENTS.LONG_HAUL);
+
+      if (attempts.length >= 3) {
+        const a1 = attempts[attempts.length-1].score / attempts[attempts.length-1].totalQuestions;
+        const a2 = attempts[attempts.length-2].score / attempts[attempts.length-2].totalQuestions;
+        const a3 = attempts[attempts.length-3].score / attempts[attempts.length-3].totalQuestions;
+        if (a1 > a2 && a2 > a3) award(ACHIEVEMENTS.STEADY_PROGRESS);
+      }
+
+      if (user.achievements.length >= 30) award(ACHIEVEMENTS.KNOWLEDGE_HUB);
+      if (user.achievements.length >= 50) award(ACHIEVEMENTS.LEGENDARY_STATUS);
+    }
 
     if (newlyEarned.length > 0 || true) { // Check title even if no new achievement this time
       const totalAchievements = user.achievements.length;
-      if (totalAchievements >= 10) {
+      if (totalAchievements >= 60) {
+        user.title = 'Sovereign of Medical Knowledge';
+      } else if (totalAchievements >= 50) {
+        user.title = 'Grandmaster Clinician';
+      } else if (totalAchievements >= 40) {
+        user.title = 'Eminent Health Scholar';
+      } else if (totalAchievements >= 30) {
+        user.title = 'Legendary Clinician';
+      } else if (totalAchievements >= 25) {
+        user.title = 'Master of Nursing';
+      } else if (totalAchievements >= 20) {
         user.title = 'Healthcare Hero';
-      } else if (totalAchievements >= 7) {
+      } else if (totalAchievements >= 15) {
         user.title = 'Clinical Commander';
-      } else if (totalAchievements >= 4) {
+      } else if (totalAchievements >= 10) {
         user.title = 'Medical Maestro';
-      } else if (totalAchievements >= 1) {
+      } else if (totalAchievements >= 5) {
         user.title = 'Rising Nightingale';
       } else {
         user.title = 'Nursing Aspirant';
