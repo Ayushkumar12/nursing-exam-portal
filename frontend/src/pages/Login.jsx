@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAchievement } from '../context/AchievementContext';
 import {
   Container,
   Paper,
@@ -32,6 +33,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
+  const { celebrate } = useAchievement();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -40,8 +42,12 @@ const Login = () => {
     setError('');
     
     try {
-      const user = await login(email, password);
-      if (user.role === 'admin') navigate('/admin');
+      const data = await login(email, password);
+      if (data.newAchievements && data.newAchievements.length > 0) {
+        celebrate(data.newAchievements);
+      }
+      
+      if (data.user.role === 'admin') navigate('/admin');
       else navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Invalid email or password');

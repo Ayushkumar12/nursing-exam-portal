@@ -26,6 +26,41 @@ const ACHIEVEMENTS = {
     title: 'Exam Master',
     description: 'Completed 10 exams!',
     icon: '🎓'
+  },
+  FIRST_LOGIN: {
+    title: 'Welcome Aboard',
+    description: 'Logged in for the first time!',
+    icon: '👋'
+  },
+  THREE_DAY_STREAK: {
+    title: 'Consistent Learner',
+    description: 'Maintained a 3-day login streak!',
+    icon: '🔥'
+  },
+  FIVE_DAY_STREAK: {
+    title: 'Workhorse',
+    description: 'Maintained a 5-day login streak!',
+    icon: '🐎'
+  },
+  SEVEN_DAY_STREAK: {
+    title: 'Dedicated Scholar',
+    description: 'Maintained a 7-day login streak!',
+    icon: '⚡'
+  },
+  NINE_DAY_STREAK: {
+    title: 'Unstoppable Force',
+    description: 'Maintained a 9-day login streak!',
+    icon: '🚀'
+  },
+  CHAT_BEGINNER: {
+    title: 'Curious Mind',
+    description: 'Used the AI Tutor for the first time!',
+    icon: '🤖'
+  },
+  CHAT_MASTER: {
+    title: 'AI Enthusiast',
+    description: 'Asked 10 questions to the AI Tutor!',
+    icon: '🧠'
   }
 };
 
@@ -76,6 +111,31 @@ const checkAndAwardAchievements = async (userId) => {
     // 5. Ten Exams
     if (attempts.length >= 10) {
       award(ACHIEVEMENTS.TEN_EXAMS);
+    }
+
+    // 6. Login Streaks
+    if (user.lastLogin) {
+      award(ACHIEVEMENTS.FIRST_LOGIN);
+    }
+    if (user.loginStreak >= 3) {
+      award(ACHIEVEMENTS.THREE_DAY_STREAK);
+    }
+    if (user.loginStreak >= 5) {
+      award(ACHIEVEMENTS.FIVE_DAY_STREAK);
+    }
+    if (user.loginStreak >= 7) {
+      award(ACHIEVEMENTS.SEVEN_DAY_STREAK);
+    }
+    if (user.loginStreak >= 9) {
+      award(ACHIEVEMENTS.NINE_DAY_STREAK);
+    }
+
+    // 7. Chatbot Usage
+    if (user.chatbotUsageCount >= 1) {
+      award(ACHIEVEMENTS.CHAT_BEGINNER);
+    }
+    if (user.chatbotUsageCount >= 10) {
+      award(ACHIEVEMENTS.CHAT_MASTER);
     }
 
     if (newlyEarned.length > 0) {

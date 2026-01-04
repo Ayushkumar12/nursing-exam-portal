@@ -12,6 +12,9 @@ const userSchema = new mongoose.Schema({
     icon: { type: String },
     earnedAt: { type: Date, default: Date.now }
   }],
+  lastLogin: { type: Date },
+  loginStreak: { type: Number, default: 0 },
+  chatbotUsageCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 

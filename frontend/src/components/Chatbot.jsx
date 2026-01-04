@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../api/axios';
 import TypingEffect from './ui/TypingEffect';
+import FormattedMessage from './ui/FormattedMessage';
+import { useAchievement } from '../context/AchievementContext';
 import {
   Box,
   Paper,
@@ -39,6 +41,7 @@ const Chatbot = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const { celebrate } = useAchievement();
 
   const quickActions = [
     { icon: <BookOpenIcon sx={{ fontSize: 16 }} />, label: 'Study Tips', prompt: 'Give me some nursing study tips.' },
@@ -92,8 +95,16 @@ const Chatbot = () => {
 
     try {
       const response = await api.post('/ai/chat', { message: messageToSend });
-      const assistantMessage = { role: 'assistant', content: response.data.reply };
+      const assistantMessage = { 
+        role: 'assistant', 
+        content: response.data.reply,
+        imageUrl: response.data.imageUrl 
+      };
       setMessages((prev) => [...prev, assistantMessage]);
+      
+      if (response.data.newAchievements && response.data.newAchievements.length > 0) {
+        celebrate(response.data.newAchievements);
+      }
     } catch (error) {
       setMessages((prev) => [...prev, { role: 'assistant', content: 'Technical error. Please try again.' }]);
     } finally {
@@ -205,7 +216,12 @@ const Chatbot = () => {
                         {msg.role === 'assistant' && index === messages.length - 1 ? (
                           <TypingEffect text={msg.content} speed={20} />
                         ) : (
-                          msg.content
+                          <FormattedMessage content={msg.content} />
+                        )}
+                        {msg.imageUrl && (
+                          <Box sx={{ mt: 1, borderRadius: '8px', overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                            <img src={msg.imageUrl} alt="AI Illustration" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                          </Box>
                         )}
                       </Paper>
                     </Box>

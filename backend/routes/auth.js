@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { logActivity } = require('../utils/logger');
+const { checkAndAwardAchievements } = require('../utils/achievementHandler');
 
 // Register
 router.post('/register', async (req, res) => {
@@ -63,12 +64,38 @@ router.post('/login', async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).send({ error: 'Invalid login credentials' });
     }
+
+    // Update login streak and last login
+    const now = new Date();
+    const lastLogin = user.lastLogin;
+    
+    if (!lastLogin) {
+      user.loginStreak = 1;
+    } else {
+      const lastLoginDate = new Date(lastLogin).setHours(0, 0, 0, 0);
+      const todayDate = new Date(now).setHours(0, 0, 0, 0);
+      const diffDays = Math.floor((todayDate - lastLoginDate) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        user.loginStreak += 1;
+      } else if (diffDays > 1) {
+        user.loginStreak = 1;
+      }
+      // if diffDays === 0, keep current streak
+    }
+    
+    user.lastLogin = now;
+    await user.save();
+
+    // Check achievements
+    const newAchievements = await checkAndAwardAchievements(user._id);
+
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
     await logActivity(user._id, 'LOGIN', 'Student login');
     // Remove password from response
-    const userResponse = user.toObject();
+    const userResponse = (await User.findById(user._id)).toObject();
     delete userResponse.password;
-    res.send({ user: userResponse, token });
+    res.send({ user: userResponse, token, newAchievements });
   } catch (error) {
     console.error('Login error:', error.message, error.stack);
     res.status(400).send({ error: error.message });

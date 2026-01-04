@@ -155,74 +155,77 @@ const ReportCard = ({ data }) => {
         Detailed Performance Log
       </Typography>
       
-      <TableContainer 
-        component={Paper} 
-        variant="outlined" 
-        sx={{ borderRadius: 3 }}
+      <Box
         component={motion.div}
         variants={itemVariants}
       >
-        <Table>
-          <TableHead sx={{ bgcolor: 'grey.50' }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 700 }}>Exam Name</TableCell>
-              <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
-              <TableCell sx={{ fontWeight: 700 }} align="center">Score</TableCell>
-              <TableCell sx={{ fontWeight: 700 }} align="center">Percentage</TableCell>
-              <TableCell sx={{ fontWeight: 700 }} align="right">Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {attempts.length > 0 ? (
-              attempts.map((attempt, index) => {
-                const percentage = (attempt.score / attempt.totalQuestions) * 100;
-                const isPassed = percentage >= 50;
-                
-                return (
-                  <TableRow 
-                    key={attempt._id} 
-                    hover
-                    component={motion.tr}
-                    variants={itemVariants}
-                  >
-                    <TableCell sx={{ fontWeight: 600 }}>{attempt.exam}</TableCell>
-                    <TableCell color="text.secondary">
-                      {new Date(attempt.date).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </TableCell>
-                    <TableCell align="center">
-                      {attempt.score} / {attempt.totalQuestions}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography fontWeight={700} color={isPassed ? 'success.main' : 'error.main'}>
-                        {percentage.toFixed(2)}%
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Chip 
-                        label={isPassed ? 'PASSED' : 'FAILED'} 
-                        size="small"
-                        color={isPassed ? 'success' : 'error'}
-                        variant="soft"
-                        sx={{ fontWeight: 700, borderRadius: 1.5 }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
+        <TableContainer 
+          component={Paper} 
+          variant="outlined" 
+          sx={{ borderRadius: 3 }}
+        >
+          <Table>
+            <TableHead sx={{ bgcolor: 'grey.50' }}>
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">No attempts recorded yet.</Typography>
-                </TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Exam Name</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Score</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Percentage</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">Status</TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {attempts.length > 0 ? (
+                attempts.map((attempt, index) => {
+                  const percentage = (attempt.score / attempt.totalQuestions) * 100;
+                  const isPassed = percentage >= 50;
+                  
+                  return (
+                    <TableRow 
+                      key={attempt._id} 
+                      hover
+                      component={motion.tr}
+                      variants={itemVariants}
+                    >
+                      <TableCell sx={{ fontWeight: 600 }}>{attempt.exam}</TableCell>
+                      <TableCell color="text.secondary">
+                        {new Date(attempt.date).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </TableCell>
+                      <TableCell align="center">
+                        {attempt.score} / {attempt.totalQuestions}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography fontWeight={700} color={isPassed ? 'success.main' : 'error.main'}>
+                          {percentage.toFixed(2)}%
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Chip 
+                          label={isPassed ? 'PASSED' : 'FAILED'} 
+                          size="small"
+                          color={isPassed ? 'success' : 'error'}
+                          variant="soft"
+                          sx={{ fontWeight: 700, borderRadius: 1.5 }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                    <Typography color="text.secondary">No attempts recorded yet.</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
 
       <Box 
         sx={{ mt: 4, textAlign: 'center' }}

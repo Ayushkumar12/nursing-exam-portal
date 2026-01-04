@@ -6,6 +6,9 @@ const Attempt = require('../models/Attempt');
 const User = require('../models/User');
 const Chat = require('../models/Chat');
 const Question = require('../models/Question');
+const { checkAndAwardAchievements } = require('../utils/achievementHandler');
+const { generatePencilDrawing } = require('../utils/aiImage');
+const { uploadImage } = require('../utils/cloudinary');
 
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -90,21 +93,26 @@ Always maintain a professional tone and emphasize patient safety and evidence-ba
 Student Information:
 - Name: ${user.name}
 - Current Focus: Nursing Exam Preparation
+- Recent Exam Performance:
+${performanceSummary}
 
 Rules for your responses:
-1. DO NOT show any tables in your response.
-2. Show only what the student asked for to ensure simple understanding.
-3. Keep the language simple, clear, and encouraging.
-4. Provide short, easy-to-understand summaries.
-5. ONLY show or discuss the "Recent Exam Performance" if the student explicitly asks about their results, performance, or scores.
+1. Keep the language simple, short, clear, and encouraging.
+2. Use small paragraphs (2-3 sentences max) to avoid large blocks of text.
+3. Use **Text** for bolding important medical terms or key points.
+4. Use ### for next line spacing between different sections or key points.
+5. Use bullet points or numbered lists for better readability.
+6. DO NOT use table formats.
+7. Show only what the student asked for to ensure simple understanding.
+8. ONLY show or discuss the "Recent Exam Performance" if the student explicitly asks about their results, performance, or scores.
+9. If you believe a visual representation (like a diagram or a clinical drawing) would help the student understand a medical concept better, include a tag at the end exactly like this: [GENERATE_IMAGE: descriptive prompt for the drawing].
 
 When the student asks about their results or performance:
 1. Provide a short, easy-to-understand summary of the performance data provided above.
 2. Highlight their strengths and areas for improvement.
 3. If they haven't taken any exams, encourage them to start a practice test.
 
-Use the student's name to personalize your responses. If they are struggling in certain areas based on the performance data, provide extra guidance and encouragement only when relevant to their questions.
-If a question is outside the medical scope or is inappropriate, politely redirect the student to relevant medical topics.`;
+Personalize your responses using the student's name. If a question is outside the medical scope, politely redirect them.`;
 
     // Prepare history for Gemini
     const history = chat.messages.slice(-10).map(m => ({
@@ -121,18 +129,39 @@ If a question is outside the medical scope or is inappropriate, politely redirec
       },
     });
 
-    // Send message with system context prepended if it's the first message or every time for consistency
     const prompt = `System Instruction: ${systemInstruction}\n\nUser Message: ${message}`;
     const result = await chatSession.sendMessage(prompt);
-    const reply = result.response.text();
+    let reply = result.response.text();
+
+    // Handle image generation if requested by AI
+    let imageUrl = null;
+    const imageTagMatch = reply.match(/\[GENERATE_IMAGE: (.*?)\]/);
+    if (imageTagMatch) {
+      try {
+        const imagePrompt = imageTagMatch[1];
+        const generatedUrl = await generatePencilDrawing(imagePrompt);
+        imageUrl = await uploadImage(generatedUrl);
+        // Remove the tag from the reply
+        reply = reply.replace(/\[GENERATE_IMAGE: (.*?)\]/, '').trim();
+      } catch (imgError) {
+        console.error('Image generation/upload failed:', imgError);
+        // We still want to send the text reply even if image fails
+        reply = reply.replace(/\[GENERATE_IMAGE: (.*?)\]/, '').trim();
+      }
+    }
 
     // Update chat history in DB
     chat.messages.push({ role: 'user', content: message });
-    chat.messages.push({ role: 'assistant', content: reply });
+    chat.messages.push({ role: 'assistant', content: reply, imageUrl });
     chat.updatedAt = Date.now();
     await chat.save();
 
-    res.json({ reply });
+    // Update user chatbot usage count and check achievements
+    user.chatbotUsageCount = (user.chatbotUsageCount || 0) + 1;
+    await user.save();
+    const newAchievements = await checkAndAwardAchievements(userId);
+
+    res.json({ reply, imageUrl, newAchievements });
   } catch (error) {
     console.error('Gemini AI Chat Error:', error);
     

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAchievement } from '../context/AchievementContext';
 import {
   Container,
   Paper,
@@ -34,6 +35,7 @@ const Register = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { register } = useAuth();
+  const { celebrate } = useAchievement();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -42,7 +44,10 @@ const Register = () => {
     setError('');
     
     try {
-      await register(name, email, password);
+      const data = await register(name, email, password);
+      if (data.newAchievements && data.newAchievements.length > 0) {
+        celebrate(data.newAchievements);
+      }
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Please try again.');
