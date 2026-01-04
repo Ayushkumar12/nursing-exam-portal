@@ -160,8 +160,11 @@ Personalize your responses using the student's name. If a question is outside th
     user.chatbotUsageCount = (user.chatbotUsageCount || 0) + 1;
     await user.save();
     const newAchievements = await checkAndAwardAchievements(userId);
+    
+    // Get updated user to return latest title/achievements
+    const updatedUser = await User.findById(userId).select('-password');
 
-    res.json({ reply, imageUrl, newAchievements });
+    res.json({ reply, imageUrl, newAchievements, user: updatedUser });
   } catch (error) {
     console.error('Gemini AI Chat Error:', error);
     

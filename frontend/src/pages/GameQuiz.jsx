@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import {
   ThemeProvider,
   createTheme,
@@ -124,6 +125,7 @@ const GameQuiz = () => {
   const [feedbackType, setFeedbackType] = useState(null);
   const [questionPoints, setQuestionPoints] = useState(10);
   const [showConfetti, setShowConfetti] = useState(false);
+  const { updateUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -238,6 +240,9 @@ const GameQuiz = () => {
 
     try {
       const { data } = await api.post('/quiz/submit', { exam, responses: formattedResponses });
+      if (data.user) {
+        updateUser(data.user);
+      }
       navigate('/result', { 
         state: { 
           attempt: data.attempt, 

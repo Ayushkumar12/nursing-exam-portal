@@ -138,7 +138,19 @@ const checkAndAwardAchievements = async (userId) => {
       award(ACHIEVEMENTS.CHAT_MASTER);
     }
 
-    if (newlyEarned.length > 0) {
+    if (newlyEarned.length > 0 || true) { // Check title even if no new achievement this time
+      const totalAchievements = user.achievements.length;
+      if (totalAchievements >= 10) {
+        user.title = 'Healthcare Hero';
+      } else if (totalAchievements >= 7) {
+        user.title = 'Clinical Commander';
+      } else if (totalAchievements >= 4) {
+        user.title = 'Medical Maestro';
+      } else if (totalAchievements >= 1) {
+        user.title = 'Rising Nightingale';
+      } else {
+        user.title = 'Nursing Aspirant';
+      }
       await user.save();
     }
 

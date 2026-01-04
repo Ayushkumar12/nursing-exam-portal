@@ -284,6 +284,14 @@ const Dashboard = () => {
               <Avatar sx={{ bgcolor: 'primary.main' }}>
                 {user?.name?.charAt(0) || 'U'}
               </Avatar>
+              <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+                <Typography variant="body2" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+                  {user?.name}
+                </Typography>
+                <Typography variant="caption" color="secondary" sx={{ fontWeight: 'bold' }}>
+                  {user?.title || 'Student'}
+                </Typography>
+              </Box>
               <Button
                 variant="outlined"
                 color="error"
@@ -381,7 +389,29 @@ const Dashboard = () => {
                       variants={itemVariants}
                       sx={{ mb: { xs: 4, md: 6 }, textAlign: { xs: 'center', md: 'left' }, px: { xs: 2, md: 0 } }}
                     >
-                      <Chip label="Student Dashboard" color="primary" variant="outlined" sx={{ mb: 2 }} />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, justifyContent: { xs: 'center', md: 'flex-start' }, flexWrap: 'wrap' }}>
+                        <Chip label="Student Dashboard" color="primary" variant="outlined" />
+                        {user?.title && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 500, delay: 0.5 }}
+                          >
+                            <Chip 
+                              label={user.title} 
+                              color="secondary" 
+                              icon={<EmojiEvents sx={{ color: 'white !important' }} />} 
+                              sx={{ 
+                                fontWeight: 'bold',
+                                background: 'linear-gradient(45deg, #9c27b0 30%, #e91e63 90%)',
+                                color: 'white',
+                                border: 'none',
+                                px: 1
+                              }} 
+                            />
+                          </motion.div>
+                        )}
+                      </Box>
                       <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' } }}>
                         <TypingEffect text={`Welcome back, ${user?.name?.split(' ')[0] || 'User'}!`} speed={50} />
                       </Typography>

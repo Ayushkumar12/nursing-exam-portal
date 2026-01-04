@@ -73,9 +73,14 @@ router.post('/submit', auth, async (req, res) => {
     // Check for new achievements
     const newlyEarned = await checkAndAwardAchievements(req.user._id);
     
+    // Get updated user to return latest title/achievements
+    const User = require('../models/User');
+    const updatedUser = await User.findById(req.user._id).select('-password');
+    
     res.status(201).send({
       attempt,
-      newAchievements: newlyEarned
+      newAchievements: newlyEarned,
+      user: updatedUser
     });
   } catch (error) {
     res.status(400).send({ error: error.message });
@@ -110,6 +115,7 @@ router.get('/report', auth, async (req, res) => {
       student: { 
         name: req.user.name, 
         email: req.user.email,
+        title: req.user.title,
         achievements: req.user.achievements 
       },
       attempts,

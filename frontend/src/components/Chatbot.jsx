@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import TypingEffect from './ui/TypingEffect';
 import FormattedMessage from './ui/FormattedMessage';
 import { useAchievement } from '../context/AchievementContext';
@@ -42,6 +43,7 @@ const Chatbot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const { celebrate } = useAchievement();
+  const { updateUser } = useAuth();
 
   const quickActions = [
     { icon: <BookOpenIcon sx={{ fontSize: 16 }} />, label: 'Study Tips', prompt: 'Give me some nursing study tips.' },
@@ -101,6 +103,10 @@ const Chatbot = () => {
         imageUrl: response.data.imageUrl 
       };
       setMessages((prev) => [...prev, assistantMessage]);
+      
+      if (response.data.user) {
+        updateUser(response.data.user);
+      }
       
       if (response.data.newAchievements && response.data.newAchievements.length > 0) {
         celebrate(response.data.newAchievements);

@@ -82,8 +82,14 @@ const ReportCard = ({ data }) => {
               <Box sx={{ mt: 1 }}>
                 <Chip 
                   icon={<School sx={{ color: 'white !important' }} />} 
-                  label="Nursing Student" 
-                  sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }} 
+                  label={student.title || 'Nursing Student'} 
+                  sx={{ 
+                    bgcolor: 'rgba(255,255,255,0.2)', 
+                    color: 'white', 
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: 1
+                  }} 
                 />
               </Box>
             </Box>
