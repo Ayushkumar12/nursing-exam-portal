@@ -61,12 +61,12 @@ const ReportCard = ({ data }) => {
         variants={itemVariants}
       >
         <Grid container spacing={3} alignItems="center">
-          <Grid item>
+          <Grid>
             <Avatar sx={{ width: 80, height: 80, bgcolor: 'rgba(255,255,255,0.2)', fontSize: '2rem' }}>
               {student.name.charAt(0)}
             </Avatar>
           </Grid>
-          <Grid item xs>
+          <Grid size="grow">
             <Typography variant="h4" fontWeight={700} gutterBottom>
               {student.name}
             </Typography>
@@ -74,7 +74,7 @@ const ReportCard = ({ data }) => {
               {student.email}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="overline" sx={{ opacity: 0.8, letterSpacing: 2 }}>
                 Academic Year 2024-25
@@ -99,7 +99,7 @@ const ReportCard = ({ data }) => {
 
       {/* Stats Summary */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper 
             variant="outlined" 
             sx={{ p: 2, textAlign: 'center', borderRadius: 3, bgcolor: '#f8fafc' }}
@@ -114,7 +114,7 @@ const ReportCard = ({ data }) => {
             <Typography variant="body2" color="text.secondary" fontWeight={600}>Total Quizzes</Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper 
             variant="outlined" 
             sx={{ p: 2, textAlign: 'center', borderRadius: 3, bgcolor: '#f8fafc' }}
@@ -131,7 +131,7 @@ const ReportCard = ({ data }) => {
             <Typography variant="body2" color="text.secondary" fontWeight={600}>Average Score</Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper 
             variant="outlined" 
             sx={{ p: 2, textAlign: 'center', borderRadius: 3, bgcolor: '#f8fafc' }}

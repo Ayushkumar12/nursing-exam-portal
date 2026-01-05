@@ -51,6 +51,8 @@ import {
   Menu,
   Close,
   Chat,
+  PlayArrow,
+  Psychology,
 } from '@mui/icons-material';
 import { blue, green, amber, purple, grey } from '@mui/material/colors';
 
@@ -509,6 +511,49 @@ const Dashboard = () => {
                                 </LineChart>
                               </ResponsiveContainer>
                             </Box>
+                          </Card>
+                        </ScrollIn>
+
+                        {/* Clinical Story Game Section */}
+                        <ScrollIn direction="up">
+                          <Card sx={{ 
+                            p: { xs: 2, md: 3 }, 
+                            mb: 4, 
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            color: 'white',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}>
+                            <Box sx={{ position: 'relative', zIndex: 1 }}>
+                              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+                                Clinical Skill Simulation
+                              </Typography>
+                              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9, maxWidth: '600px' }}>
+                                Immerse yourself in realistic clinical scenarios. Make critical nursing decisions and see their outcomes in real-time.
+                              </Typography>
+                              <Button 
+                                variant="contained" 
+                                color="secondary" 
+                                size="large" 
+                                onClick={() => navigate('/story-game')}
+                                startIcon={<PlayArrow />}
+                                sx={{ 
+                                  bgcolor: 'white', 
+                                  color: 'primary.main',
+                                  '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                                }}
+                              >
+                                Start New Scenario
+                              </Button>
+                            </Box>
+                            <Psychology sx={{ 
+                              position: 'absolute', 
+                              right: -20, 
+                              bottom: -20, 
+                              fontSize: 160, 
+                              opacity: 0.1, 
+                              color: 'white' 
+                            }} />
                           </Card>
                         </ScrollIn>
 
