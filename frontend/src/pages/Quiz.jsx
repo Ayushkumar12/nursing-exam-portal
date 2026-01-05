@@ -94,6 +94,7 @@ const Quiz = () => {
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(3000);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -168,6 +169,9 @@ const Quiz = () => {
   };
 
   const handleSubmit = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+
     const formattedResponses = Object.keys(responses).map(index => ({
       questionId: questions[index]._id,
       selectedOption: questions[index].mapping[responses[index]]
@@ -187,6 +191,7 @@ const Quiz = () => {
       });
     } catch (err) {
       console.error(err);
+      setSubmitting(false);
     }
   };
 
@@ -435,10 +440,11 @@ const Quiz = () => {
                 variant="contained"
                 color="secondary"
                 onClick={handleSubmit}
-                endIcon={<CheckCircle />}
+                disabled={submitting}
+                endIcon={submitting ? <CircularProgress size={24} color="inherit" /> : <CheckCircle />}
                 sx={{ flex: 1, py: 2 }}
               >
-                Submit Quiz
+                {submitting ? 'Submitting...' : 'Submit Quiz'}
               </Button>
             ) : (
               <Button

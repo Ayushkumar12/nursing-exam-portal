@@ -116,6 +116,7 @@ const GameQuiz = () => {
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(3000);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -233,6 +234,9 @@ const GameQuiz = () => {
   };
 
   const handleSubmit = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+
     const formattedResponses = Object.keys(responses).map(index => ({
       questionId: questions[index]._id,
       selectedOption: questions[index].mapping[responses[index]]
@@ -254,6 +258,7 @@ const GameQuiz = () => {
       });
     } catch (err) {
       console.error(err);
+      setSubmitting(false);
     }
   };
 
@@ -640,10 +645,11 @@ const GameQuiz = () => {
                 variant="contained"
                 color="secondary"
                 onClick={handleSubmit}
-                endIcon={<CheckCircle />}
+                disabled={submitting}
+                endIcon={submitting ? <CircularProgress size={24} color="inherit" /> : <CheckCircle />}
                 sx={{ flex: 1, py: 2 }}
               >
-                Finish Game
+                {submitting ? 'Finishing...' : 'Finish Game'}
               </Button>
             ) : (
               <Button
