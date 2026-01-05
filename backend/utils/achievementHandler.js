@@ -164,11 +164,30 @@ const ACHIEVEMENTS = {
   LONG_HAUL: { title: 'Long Haul', description: 'Completed 10 exams in a single week!', icon: '🚛' },
   STEADY_PROGRESS: { title: 'Steady Progress', description: 'Increased score in 3 consecutive exams!', icon: '📈' },
   NO_STONE_UNTURNED: { title: 'No Stone Unturned', description: 'Attempted every available exam type!', icon: '💎' },
+  // --- Clinical Simulation Achievements ---
+  SIM_NOVICE: { title: 'Sim Novice', description: 'Completed your first clinical simulation!', icon: '🩺' },
+  SIM_EXPERT: { title: 'Sim Expert', description: 'Successfully resolved 5 clinical simulations!', icon: '🚑' },
+  SIM_MASTER: { title: 'Sim Master', description: 'Successfully resolved 15 clinical simulations!', icon: '🏥' },
+  LIFESAVER: { title: 'Lifesaver', description: 'Resolved a clinical simulation with the patient in critical status!', icon: '❤️' },
+  // --- Funny/Worsened Case Achievements ---
+  OOPSIE_DAISY: { title: 'Oopsie Daisy', description: 'The patient\'s condition worsened significantly under your care.', icon: '🫣' },
+  PANIC_MODE: { title: 'Panic Mode', description: 'Made decisions that led to a deteriorating patient status.', icon: '😨' },
+  WALKING_LIABILITY: { title: 'Walking Liability', description: 'Finished a simulation with the patient in a worse state than they started.', icon: '🚔' },
+  // --- Good/Improved Case Achievements ---
+  NIGHTINGALES_TOUCH: { title: 'Nightingale\'s Touch', description: 'Patient condition improved in every single step of the simulation!', icon: '✨' },
+  CALM_UNDER_PRESSURE: { title: 'Calm Under Pressure', description: 'Stabilized a critical patient with expert precision.', icon: '🧘' },
+  CLINICAL_INSTINCT: { title: 'Clinical Instinct', description: 'Perfectly resolved a complex clinical case.', icon: '🧠' },
+  // --- New Variety Simulation Achievements ---
+  DOUBLE_SHIFT: { title: 'Double Shift', description: 'Completed 5 clinical simulations in a single day.', icon: '☕' },
+  ZOMBIE_DOC: { title: 'Zombie Doc', description: 'Failed 5 clinical simulations in total. Maybe take a break?', icon: '🧟' },
+  CODE_BLUE_VETERAN: { title: 'Code Blue Veteran', description: 'Successfully resolved 10 cases that were in Critical status.', icon: '🚨' },
+  PHARMA_PRO: { title: 'Pharmacology Pro', description: 'Correctly administered medication in a clinical simulation.', icon: '💊' },
+  VITALS_VIRTUOSO: { title: 'Vitals Virtuoso', description: 'Finished a simulation with all patient vitals in perfect normal range.', icon: '📈' },
   KNOWLEDGE_HUB: { title: 'Knowledge Hub', description: 'Earned 30 different achievements!', icon: '🏢' },
   LEGENDARY_STATUS: { title: 'Legendary Status', description: 'Earned 50 different achievements!', icon: '👑' }
 };
 
-const checkAndAwardAchievements = async (userId) => {
+const checkAndAwardAchievements = async (userId, metadata = {}) => {
   try {
     const user = await User.findById(userId);
     if (!user) return [];
@@ -246,6 +265,87 @@ const checkAndAwardAchievements = async (userId) => {
     }
     if (user.chatbotUsageCount >= 10) {
       award(ACHIEVEMENTS.CHAT_MASTER);
+    }
+
+    // 9. Clinical Simulation Achievements
+    if (user.storyGamesCompleted >= 1) {
+      award(ACHIEVEMENTS.SIM_NOVICE);
+    }
+    if (user.successfulSimulations >= 5) {
+      award(ACHIEVEMENTS.SIM_EXPERT);
+    }
+    if (user.successfulSimulations >= 15) {
+      award(ACHIEVEMENTS.SIM_MASTER);
+    }
+    
+    // Lifesaver: Resolved while patient was in critical status
+    if (metadata.gameSuccess && metadata.finalStatus === 'Critical') {
+      award(ACHIEVEMENTS.LIFESAVER);
+    }
+
+    // New Variety Logic
+    if (user.failedSimulations >= 5) {
+      award(ACHIEVEMENTS.ZOMBIE_DOC);
+    }
+    if (user.criticalSimsResolved >= 10) {
+      award(ACHIEVEMENTS.CODE_BLUE_VETERAN);
+    }
+    
+    // Pharma Pro: Check for medication keywords in lastAction
+    const pharmaKeywords = ['medication', 'administer', 'dose', 'drug', 'injection', 'pill', 'iv', 'infusion', 'mg', 'mcg', 'bolus'];
+    if (metadata.lastAction && pharmaKeywords.some(k => metadata.lastAction.toLowerCase().includes(k))) {
+      award(ACHIEVEMENTS.PHARMA_PRO);
+    }
+
+    // Vitals Virtuoso: Basic normal ranges check
+    if (metadata.gameSuccess && metadata.vitals) {
+        const { bp, hr, rr, spo2 } = metadata.vitals;
+        // Simple heuristic for "normal"
+        const hrNum = parseInt(hr);
+        const rrNum = parseInt(rr);
+        const spo2Num = parseInt(spo2);
+        if (hrNum >= 60 && hrNum <= 100 && rrNum >= 12 && rrNum <= 20 && spo2Num >= 95) {
+            award(ACHIEVEMENTS.VITALS_VIRTUOSO);
+        }
+    }
+
+    // Double Shift: 5 sims in 24h
+    // We can use activities or just assume based on current session if we had history
+    // For now, let's check recent activity count for GAME_COMPLETED
+    const Activity = require('../models/Activity');
+    const todayStart = new Date().setHours(0,0,0,0);
+    const simsToday = await Activity.countDocuments({ 
+        user: userId, 
+        action: 'GAME_COMPLETED',
+        date: { $gte: todayStart }
+    });
+    if (simsToday >= 5) {
+        award(ACHIEVEMENTS.DOUBLE_SHIFT);
+    }
+
+    // New Funny/Worsened Logic
+    if (metadata.conditionChange === 'Worsened' || metadata.finalStatus === 'Deteriorating') {
+      award(ACHIEVEMENTS.PANIC_MODE);
+    }
+    if (!metadata.gameSuccess && metadata.gameOver) {
+      award(ACHIEVEMENTS.OOPSIE_DAISY);
+      if (metadata.finalStatus === 'Critical' || metadata.finalStatus === 'Deteriorating') {
+        award(ACHIEVEMENTS.WALKING_LIABILITY);
+      }
+    }
+
+    // New Good/Improved Logic
+    if (metadata.gameSuccess && metadata.conditionChange === 'Improved') {
+        // If they succeeded and the last step was an improvement
+        award(ACHIEVEMENTS.CLINICAL_INSTINCT);
+    }
+    if (metadata.gameSuccess && metadata.finalStatus === 'Stable' && metadata.initialStatus !== 'Stable') {
+        award(ACHIEVEMENTS.CALM_UNDER_PRESSURE);
+    }
+    // Nightingale's Touch is hard to track without full history in metadata, 
+    // but we can approximate it or just award it on high-success streaks
+    if (metadata.gameSuccess && metadata.allStepsImproved) {
+        award(ACHIEVEMENTS.NIGHTINGALES_TOUCH);
     }
     
     // 8. Performance and Time-based

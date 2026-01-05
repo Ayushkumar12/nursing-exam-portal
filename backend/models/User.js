@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
   loginStreak: { type: Number, default: 0 },
   title: { type: String, default: 'Nursing Aspirant' },
   chatbotUsageCount: { type: Number, default: 0 },
+  storyGamesCompleted: { type: Number, default: 0 },
+  successfulSimulations: { type: Number, default: 0 },
+  failedSimulations: { type: Number, default: 0 },
+  criticalSimsResolved: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });
 

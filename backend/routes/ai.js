@@ -9,10 +9,7 @@ const Question = require('../models/Question');
 const { checkAndAwardAchievements } = require('../utils/achievementHandler');
 const { generatePencilDrawing } = require('../utils/aiImage');
 const { uploadImage } = require('../utils/cloudinary');
-
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+const { generateWithRetry } = require('../utils/geminiRetry');
 
 router.post('/career-insight', auth, async (req, res) => {
   try {
@@ -50,7 +47,7 @@ router.post('/career-insight', auth, async (req, res) => {
     2. Provide one specific, actionable advice for their career or study path.
     Keep the tone encouraging, professional, and clear. Do not use any markdown formatting like bold or tables, just plain text.`;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateWithRetry(prompt);
     const insight = result.response.text();
 
     res.json({ insight });
@@ -120,17 +117,15 @@ Personalize your responses using the student's name. If a question is outside th
       parts: [{ text: m.content }],
     }));
 
-    // Start chat with system instruction prefixed to the message or as a system prompt if supported
-    // For simplicity with gemini-1.5-flash, we'll use a chat session
-    const chatSession = model.startChat({
+    const chatParams = {
       history: history,
+      message: `System Instruction: ${systemInstruction}\n\nUser Message: ${message}`,
       generationConfig: {
         maxOutputTokens: 1000,
-      },
-    });
+      }
+    };
 
-    const prompt = `System Instruction: ${systemInstruction}\n\nUser Message: ${message}`;
-    const result = await chatSession.sendMessage(prompt);
+    const result = await generateWithRetry(chatParams, {}, true);
     let reply = result.response.text();
 
     // Handle image generation if requested by AI

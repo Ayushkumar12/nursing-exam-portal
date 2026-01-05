@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import TypingEffect from '../components/ui/TypingEffect';
 import ScrollIn from '../components/ui/ScrollIn';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import ReportCard from '../components/ReportCard';
 import {
@@ -133,6 +133,19 @@ const hoverVariants = {
   },
 };
 
+
+const TITLES = [
+  { name: 'Nursing Aspirant', min: 0 },
+  { name: 'Rising Nightingale', min: 5 },
+  { name: 'Medical Maestro', min: 10 },
+  { name: 'Clinical Commander', min: 15 },
+  { name: 'Healthcare Hero', min: 20 },
+  { name: 'Master of Nursing', min: 25 },
+  { name: 'Legendary Clinician', min: 30 },
+  { name: 'Eminent Health Scholar', min: 40 },
+  { name: 'Grandmaster Clinician', min: 50 },
+  { name: 'Sovereign of Medical Knowledge', min: 60 },
+];
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -466,49 +479,151 @@ const Dashboard = () => {
                         {/* Performance Chart */}
                         <ScrollIn direction="left">
                           <Card 
-                            sx={{ p: { xs: 2, md: 3 }, mb: 4 }}
+                            sx={{ 
+                              p: { xs: 3, md: 4 }, 
+                              mb: 4,
+                              borderRadius: 5,
+                              boxShadow: '0 4px 30px rgba(0,0,0,0.05)',
+                              border: '1px solid',
+                              borderColor: 'grey.100',
+                              background: 'linear-gradient(to bottom, #ffffff, #fcfcfd)',
+                            }}
                           >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 3 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 3, mb: 4 }}>
                               <Box>
-                                <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                <Typography variant="h6" sx={{ 
+                                  fontWeight: 800, 
+                                  color: 'text.primary',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1.5
+                                }}>
+                                  <TrendingUp sx={{ color: blue[600] }} />
                                   Performance Analytics
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
-                                  Track your academic growth over time
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 500 }}>
+                                  Your score progression over the last few attempts
                                 </Typography>
                               </Box>
-                              <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
-                                <Button variant="contained" size="small" fullWidth={isMobile}>
-                                  Score Trend
+                              <Box sx={{ 
+                                display: 'flex', 
+                                p: 0.5, 
+                                bgcolor: 'grey.100', 
+                                borderRadius: 3,
+                                width: { xs: '100%', sm: 'auto' }
+                              }}>
+                                <Button 
+                                  variant="contained" 
+                                  size="small" 
+                                  disableElevation
+                                  sx={{ 
+                                    borderRadius: 2.5,
+                                    bgcolor: 'white',
+                                    color: 'primary.main',
+                                    fontWeight: 700,
+                                    '&:hover': { bgcolor: 'white' },
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                                  }}
+                                  fullWidth={isMobile}
+                                >
+                                  Score
                                 </Button>
-                                <Button variant="outlined" size="small" fullWidth={isMobile}>
-                                  Time Trend
+                                <Button 
+                                  variant="text" 
+                                  size="small" 
+                                  sx={{ 
+                                    borderRadius: 2.5,
+                                    color: 'text.secondary',
+                                    fontWeight: 600,
+                                    ml: 0.5
+                                  }}
+                                  fullWidth={isMobile}
+                                >
+                                  Growth
                                 </Button>
                               </Box>
                             </Box>
-                            <Box sx={{ height: { xs: 250, sm: 300 }, width: '100%', minWidth: 0, minHeight: 250 }}>
-                              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                                <LineChart data={chartData}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                  <XAxis dataKey="date" stroke="#64748b" fontSize={12} />
-                                  <YAxis stroke="#64748b" fontSize={12} />
+                            
+                            <Box sx={{ height: { xs: 280, sm: 320 }, width: '100%', position: 'relative' }}>
+                              <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                  <defs>
+                                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                      <stop offset="5%" stopColor={blue[600]} stopOpacity={0.2}/>
+                                      <stop offset="95%" stopColor={blue[600]} stopOpacity={0}/>
+                                    </linearGradient>
+                                  </defs>
+                                  <CartesianGrid 
+                                    strokeDasharray="4 4" 
+                                    vertical={false} 
+                                    stroke="#f1f5f9" 
+                                  />
+                                  <XAxis 
+                                    dataKey="date" 
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                                    dy={15}
+                                  />
+                                  <YAxis 
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                                    domain={[0, 100]}
+                                    ticks={[0, 25, 50, 75, 100]}
+                                    tickFormatter={(value) => `${value}%`}
+                                  />
                                   <Tooltip
-                                    contentStyle={{
-                                      backgroundColor: 'white',
-                                      border: 'none',
-                                      borderRadius: '8px',
-                                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    cursor={{ stroke: blue[200], strokeWidth: 2, strokeDasharray: '5 5' }}
+                                    content={({ active, payload, label }) => {
+                                      if (active && payload && payload.length) {
+                                        return (
+                                          <Paper sx={{ 
+                                            p: 2, 
+                                            borderRadius: 3, 
+                                            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                                            border: '1px solid',
+                                            borderColor: 'grey.100',
+                                            minWidth: 120
+                                          }}>
+                                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                                              {label}
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: blue[600] }} />
+                                              <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                                {payload[0].value}% Score
+                                              </Typography>
+                                            </Box>
+                                          </Paper>
+                                        );
+                                      }
+                                      return null;
                                     }}
                                   />
-                                  <Line
+                                  <Area
                                     type="monotone"
                                     dataKey="score"
                                     stroke={blue[600]}
-                                    strokeWidth={3}
-                                    dot={{ fill: blue[600], strokeWidth: 2, r: 6 }}
-                                    activeDot={{ r: 8, stroke: blue[600], strokeWidth: 2, fill: 'white' }}
+                                    strokeWidth={4}
+                                    fillOpacity={1}
+                                    fill="url(#colorScore)"
+                                    animationDuration={1500}
+                                    dot={{ 
+                                      fill: '#fff', 
+                                      stroke: blue[600], 
+                                      strokeWidth: 3, 
+                                      r: 5,
+                                      fillOpacity: 1
+                                    }}
+                                    activeDot={{ 
+                                      r: 8, 
+                                      strokeWidth: 0, 
+                                      fill: blue[600],
+                                      boxShadow: '0 0 10px rgba(37, 99, 235, 0.5)'
+                                    }}
                                   />
-                                </LineChart>
+                                </AreaChart>
                               </ResponsiveContainer>
                             </Box>
                           </Card>
@@ -517,42 +632,207 @@ const Dashboard = () => {
                         {/* Clinical Story Game Section */}
                         <ScrollIn direction="up">
                           <Card sx={{ 
-                            p: { xs: 2, md: 3 }, 
+                            p: { xs: 3, md: 5 }, 
                             mb: 4, 
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%)',
                             color: 'white',
                             position: 'relative',
-                            overflow: 'hidden'
+                            overflow: 'hidden',
+                            borderRadius: 6,
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
                           }}>
-                            <Box sx={{ position: 'relative', zIndex: 1 }}>
-                              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+                            <Box 
+                              component={motion.div}
+                              initial={{ opacity: 0, x: -20 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.6 }}
+                              sx={{ position: 'relative', zIndex: 1 }}
+                            >
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                                <Box sx={{ 
+                                  bgcolor: 'rgba(255,255,255,0.2)', 
+                                  p: 1, 
+                                  borderRadius: 2, 
+                                  display: 'flex',
+                                  backdropFilter: 'blur(4px)'
+                                }}>
+                                  <Psychology sx={{ fontSize: 24 }} />
+                                </Box>
+                                <Typography variant="overline" sx={{ letterSpacing: 2, fontWeight: 700, opacity: 0.9 }}>
+                                  {user?.title || 'Interactive Learning'}
+                                </Typography>
+                              </Box>
+
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, alignItems: 'center' }}>
+                                {(() => {
+                                  const totalAchievements = reportData?.student?.achievements?.length || 0;
+                                  const currentTitleIndex = TITLES.findIndex((t, i) => {
+                                      const nextMin = TITLES[i+1]?.min || Infinity;
+                                      return totalAchievements >= t.min && totalAchievements < nextMin;
+                                  });
+                                  const currentTitle = TITLES[currentTitleIndex] || TITLES[0];
+                                  const nextTitle = TITLES[currentTitleIndex + 1];
+                                  const progressToNext = nextTitle ? ((totalAchievements - currentTitle.min) / (nextTitle.min - currentTitle.min)) * 100 : 100;
+
+                                  return (
+                                    <>
+                                      <Chip 
+                                        label={`Rank: ${currentTitle.name}`}
+                                        size="small"
+                                        sx={{ 
+                                          bgcolor: 'rgba(255,255,255,0.9)', 
+                                          color: '#4f46e5',
+                                          fontWeight: 800,
+                                          fontSize: '0.75rem',
+                                          border: 'none'
+                                        }}
+                                      />
+                                      {nextTitle && (
+                                        <Box sx={{ ml: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                          <Box sx={{ width: 100, height: 6, bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 3, overflow: 'hidden' }}>
+                                            <Box sx={{ width: `${progressToNext}%`, height: '100%', bgcolor: 'white' }} />
+                                          </Box>
+                                          <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.8 }}>
+                                            {totalAchievements}/{nextTitle.min} to {nextTitle.name}
+                                          </Typography>
+                                        </Box>
+                                      )}
+                                    </>
+                                  );
+                                })()}
+                              </Box>
+
+                              <Typography variant="h4" gutterBottom sx={{ 
+                                fontWeight: 800, 
+                                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                fontSize: { xs: '1.75rem', md: '2.5rem' }
+                              }}>
                                 Clinical Skill Simulation
                               </Typography>
-                              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9, maxWidth: '600px' }}>
-                                Immerse yourself in realistic clinical scenarios. Make critical nursing decisions and see their outcomes in real-time.
+                              
+                              <Typography variant="body1" sx={{ 
+                                mb: 3, 
+                                opacity: 0.9, 
+                                maxWidth: '550px',
+                                fontSize: '1.1rem',
+                                lineHeight: 1.6
+                              }}>
+                                Master real-world nursing through immersive scenarios. Make critical decisions, witness consequences, and sharpen your clinical judgment in a risk-free environment.
                               </Typography>
+
+                              {reportData?.student?.achievements?.length > 0 && (
+                                <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                  <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                    Recent Achievements:
+                                  </Typography>
+                                  <Box sx={{ display: 'flex', gap: 1 }}>
+                                    {reportData.student.achievements.slice(-3).reverse().map((achievement, idx) => (
+                                      <Tooltip key={idx} title={achievement.title} arrow>
+                                        <Box 
+                                          component={motion.div}
+                                          whileHover={{ y: -5, scale: 1.1 }}
+                                          sx={{ 
+                                            width: 40, 
+                                            height: 40, 
+                                            bgcolor: 'rgba(255,255,255,0.2)', 
+                                            borderRadius: '50%', 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'center',
+                                            fontSize: '1.25rem',
+                                            backdropFilter: 'blur(4px)',
+                                            border: '1px solid rgba(255,255,255,0.3)',
+                                            cursor: 'pointer'
+                                          }}
+                                        >
+                                          {achievement.icon || '🏆'}
+                                        </Box>
+                                      </Tooltip>
+                                    ))}
+                                    {reportData.student.achievements.length > 3 && (
+                                      <Box 
+                                        onClick={() => setActiveTab(3)}
+                                        sx={{ 
+                                          width: 40, 
+                                          height: 40, 
+                                          bgcolor: 'rgba(255,255,255,0.1)', 
+                                          borderRadius: '50%', 
+                                          display: 'flex', 
+                                          alignItems: 'center', 
+                                          justifyContent: 'center',
+                                          fontSize: '0.75rem',
+                                          fontWeight: 800,
+                                          backdropFilter: 'blur(4px)',
+                                          border: '1px solid rgba(255,255,255,0.2)',
+                                          cursor: 'pointer',
+                                          '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
+                                        }}
+                                      >
+                                        +{reportData.student.achievements.length - 3}
+                                      </Box>
+                                    )}
+                                  </Box>
+                                </Box>
+                              )}
+
                               <Button 
                                 variant="contained" 
-                                color="secondary" 
                                 size="large" 
                                 onClick={() => navigate('/story-game')}
                                 startIcon={<PlayArrow />}
+                                component={motion.button}
+                                whileHover={{ scale: 1.05, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.2)' }}
+                                whileTap={{ scale: 0.98 }}
                                 sx={{ 
                                   bgcolor: 'white', 
-                                  color: 'primary.main',
-                                  '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                                  color: '#4f46e5',
+                                  px: 4,
+                                  py: 1.5,
+                                  borderRadius: 3,
+                                  fontSize: '1rem',
+                                  fontWeight: 700,
+                                  '&:hover': { bgcolor: '#f8fafc' }
                                 }}
                               >
-                                Start New Scenario
+                                Launch Simulation
                               </Button>
                             </Box>
-                            <Psychology sx={{ 
-                              position: 'absolute', 
-                              right: -20, 
-                              bottom: -20, 
-                              fontSize: 160, 
-                              opacity: 0.1, 
-                              color: 'white' 
+
+                            {/* Decorative Elements */}
+                            <Box
+                              component={motion.div}
+                              animate={{ 
+                                rotate: [0, 360],
+                                scale: [1, 1.1, 1]
+                              }}
+                              transition={{ 
+                                duration: 20, 
+                                repeat: Infinity,
+                                ease: "linear" 
+                              }}
+                              sx={{ 
+                                position: 'absolute', 
+                                right: -40, 
+                                bottom: -40, 
+                                fontSize: 280, 
+                                opacity: 0.15, 
+                                color: 'white',
+                                display: 'flex'
+                              }}
+                            >
+                              <Psychology sx={{ fontSize: 'inherit' }} />
+                            </Box>
+
+                            <Box sx={{ 
+                              position: 'absolute',
+                              top: -50,
+                              left: '20%',
+                              width: 200,
+                              height: 200,
+                              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%)',
+                              borderRadius: '50%',
+                              pointerEvents: 'none'
                             }} />
                           </Card>
                         </ScrollIn>
