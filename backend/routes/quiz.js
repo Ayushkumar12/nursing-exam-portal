@@ -90,7 +90,9 @@ router.post('/submit', auth, async (req, res) => {
 // Get user history
 router.get('/history', auth, async (req, res) => {
   try {
-    const history = await Attempt.find({ user: req.user._id }).sort({ date: -1 });
+    const history = await Attempt.find({ user: req.user._id })
+      .populate('responses.questionId')
+      .sort({ date: -1 });
     res.send(history);
   } catch (error) {
     res.status(500).send({ error: error.message });
@@ -100,7 +102,9 @@ router.get('/history', auth, async (req, res) => {
 // Get user report
 router.get('/report', auth, async (req, res) => {
   try {
-    const attempts = await Attempt.find({ user: req.user._id }).sort({ date: -1 });
+    const attempts = await Attempt.find({ user: req.user._id })
+      .populate('responses.questionId')
+      .sort({ date: -1 });
     const stats = {
       totalAttempts: attempts.length,
       averageScore: attempts.length > 0 

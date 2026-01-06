@@ -33,6 +33,13 @@ import {
   useMediaQuery,
   Tabs,
   Tab,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Alert,
+  List,
+  ListItem,
+  Stack,
 } from '@mui/material';
 import {
   Logout,
@@ -53,6 +60,10 @@ import {
   Chat,
   PlayArrow,
   Psychology,
+  ExpandMore,
+  CheckCircle,
+  Cancel,
+  Info,
 } from '@mui/icons-material';
 import { blue, green, amber, purple, grey } from '@mui/material/colors';
 
@@ -221,6 +232,30 @@ const Dashboard = () => {
   const handleLogout = () => {
     logout();
   };
+
+  const studySessions = (() => {
+    if (!Array.isArray(history)) return [];
+    
+    return history.map(attempt => {
+      const questions = attempt.responses
+        .filter(resp => resp.questionId && typeof resp.questionId === 'object')
+        .map(resp => ({
+          ...resp.questionId,
+          isCorrect: resp.isCorrect,
+          selectedOption: resp.selectedOption
+        }));
+
+      return {
+        id: attempt._id,
+        exam: attempt.exam,
+        date: attempt.date,
+        score: attempt.score,
+        totalQuestions: attempt.totalQuestions,
+        correct: questions.filter(q => q.isCorrect),
+        incorrect: questions.filter(q => !q.isCorrect)
+      };
+    });
+  })();
 
   return (
     <ThemeProvider theme={theme}>
@@ -1013,8 +1048,170 @@ const Dashboard = () => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Box sx={{ p: 4, textAlign: 'center' }}>
-                      <Typography variant="h5">Study Material coming soon...</Typography>
+                    <Box sx={{ py: 4 }}>
+                      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+                        Clinical Study Material
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                        Review your performance session by session to strengthen your clinical knowledge.
+                      </Typography>
+
+                      {studySessions.length > 0 ? (
+                        studySessions.map((session, sIdx) => (
+                          <Card key={session.id} sx={{ mb: 4, overflow: 'hidden', border: '1px solid', borderColor: 'grey.200' }}>
+                            <Box sx={{ 
+                              p: 2, 
+                              bgcolor: 'grey.50', 
+                              borderBottom: '1px solid', 
+                              borderColor: 'grey.200',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              gap: 2
+                            }}>
+                              <Box>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                  {session.exam} Session
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <AccessTime sx={{ fontSize: '0.875rem' }} />
+                                  {new Date(session.date).toLocaleString(undefined, { 
+                                    dateStyle: 'long', 
+                                    timeStyle: 'short' 
+                                  })}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Chip 
+                                  label={`Score: ${session.score}/${session.totalQuestions}`} 
+                                  color={session.score / session.totalQuestions >= 0.5 ? 'success' : 'error'}
+                                  size="small"
+                                  sx={{ fontWeight: 'bold' }}
+                                />
+                                <Chip 
+                                  label={`${Math.round((session.score / session.totalQuestions) * 100)}% Precision`}
+                                  variant="outlined"
+                                  size="small"
+                                />
+                              </Box>
+                            </Box>
+
+                            <Box sx={{ p: 2 }}>
+                              {/* Incorrect Questions First as they need most attention */}
+                              {session.incorrect.length > 0 && (
+                                <Box sx={{ mb: 3 }}>
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: 'error.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Cancel fontSize="small" /> Needs Review ({session.incorrect.length})
+                                  </Typography>
+                                  <Stack spacing={1}>
+                                    {session.incorrect.map((q, qIdx) => (
+                                      <Accordion key={q._id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'error.light', borderRadius: '8px !important' }}>
+                                        <AccordionSummary expandIcon={<ExpandMore />}>
+                                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            {qIdx + 1}. {q.question}
+                                          </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                          <Grid container spacing={1} sx={{ mb: 2 }}>
+                                            {q.options.map((opt, i) => (
+                                              <Grid size={{ xs: 12, sm: 6 }} key={i}>
+                                                <Paper sx={{ 
+                                                  p: 1.5, 
+                                                  border: '1px solid', 
+                                                  borderColor: i === q.correct ? 'success.light' : i === q.selectedOption ? 'error.light' : 'grey.100',
+                                                  bgcolor: i === q.correct ? 'success.50' : i === q.selectedOption ? 'error.50' : 'white',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  gap: 1.5
+                                                }}>
+                                                  <Avatar sx={{ bgcolor: i === q.correct ? 'success.main' : i === q.selectedOption ? 'error.main' : 'grey.200', width: 20, height: 20, fontSize: '0.7rem' }}>
+                                                    {String.fromCharCode(65 + i)}
+                                                  </Avatar>
+                                                  <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{opt}</Typography>
+                                                  {i === q.correct && <CheckCircle fontSize="inherit" color="success" sx={{ ml: 'auto' }} />}
+                                                </Paper>
+                                              </Grid>
+                                            ))}
+                                          </Grid>
+                                          <Alert severity="info" icon={<Info fontSize="small" />} sx={{ py: 0 }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>RATIONALE</Typography>
+                                            <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{q.explanation}</Typography>
+                                          </Alert>
+                                        </AccordionDetails>
+                                      </Accordion>
+                                    ))}
+                                  </Stack>
+                                </Box>
+                              )}
+
+                              {/* Correct Questions */}
+                              {session.correct.length > 0 && (
+                                <Box>
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: 'success.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <CheckCircle fontSize="small" /> Mastered Concepts ({session.correct.length})
+                                  </Typography>
+                                  <Stack spacing={1}>
+                                    {session.correct.map((q, qIdx) => (
+                                      <Accordion key={q._id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'success.light', borderRadius: '8px !important' }}>
+                                        <AccordionSummary expandIcon={<ExpandMore />}>
+                                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            {qIdx + 1}. {q.question}
+                                          </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                          <Grid container spacing={1} sx={{ mb: 2 }}>
+                                            {q.options.map((opt, i) => (
+                                              <Grid size={{ xs: 12, sm: 6 }} key={i}>
+                                                <Paper sx={{ 
+                                                  p: 1.5, 
+                                                  border: '1px solid', 
+                                                  borderColor: i === q.correct ? 'success.light' : 'grey.100',
+                                                  bgcolor: i === q.correct ? 'success.50' : 'white',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  gap: 1.5
+                                                }}>
+                                                  <Avatar sx={{ bgcolor: i === q.correct ? 'success.main' : 'grey.200', width: 20, height: 20, fontSize: '0.7rem' }}>
+                                                    {String.fromCharCode(65 + i)}
+                                                  </Avatar>
+                                                  <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{opt}</Typography>
+                                                  {i === q.correct && <CheckCircle fontSize="inherit" color="success" sx={{ ml: 'auto' }} />}
+                                                </Paper>
+                                              </Grid>
+                                            ))}
+                                          </Grid>
+                                          <Alert severity="info" icon={<Info fontSize="small" />} sx={{ py: 0 }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>RATIONALE</Typography>
+                                            <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{q.explanation}</Typography>
+                                          </Alert>
+                                        </AccordionDetails>
+                                      </Accordion>
+                                    ))}
+                                  </Stack>
+                                </Box>
+                              )}
+                            </Box>
+                          </Card>
+                        ))
+                      ) : (
+                        <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 4 }}>
+                          <MenuBook sx={{ fontSize: 100, color: 'grey.200', mb: 2 }} />
+                          <Typography variant="h5" color="text.secondary" gutterBottom>
+                            No study sessions yet
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            Complete some quizzes to see your session-wise performance here.
+                          </Typography>
+                          <Button 
+                            variant="contained" 
+                            sx={{ mt: 4 }} 
+                            onClick={() => setActiveTab(0)}
+                          >
+                            Start Your First Quiz
+                          </Button>
+                        </Paper>
+                      )}
                     </Box>
                   </motion.div>
                 )}
