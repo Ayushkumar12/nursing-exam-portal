@@ -78,23 +78,23 @@ const AdminNavbar = ({ onMenuClick }) => {
           </IconButton>
         )}
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-          <Box sx={{ 
-            backgroundColor: 'primary.main', 
-            borderRadius: 1, 
-            p: 1, 
-            mr: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <ShieldCheck sx={{ color: 'white' }} />
-          </Box>
+          <Avatar 
+            src="/staff.png"
+            sx={{ 
+              borderRadius: 1, 
+              p: 0.5, 
+              mr: 2,
+              bgcolor: 'transparent',
+              width: 40,
+              height: 40
+            }}
+          />
           <Box>
             <Typography variant="h6" component="div" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
               Admin Portal
             </Typography>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: { xs: 'none', sm: 'block' } }}>
-              Nursing Exam System
+              Medic-grow System
             </Typography>
           </Box>
         </Box>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import { generateSessionPDF } from '../utils/pdfGenerator';
 import TypingEffect from '../components/ui/TypingEffect';
 import ScrollIn from '../components/ui/ScrollIn';
 import {
@@ -64,6 +65,8 @@ import {
   CheckCircle,
   Cancel,
   Info,
+  Download,
+  Help,
 } from '@mui/icons-material';
 import { blue, green, amber, purple, grey } from '@mui/material/colors';
 
@@ -146,12 +149,12 @@ const hoverVariants = {
 
 
 const TITLES = [
-  { name: 'Nursing Aspirant', min: 0 },
-  { name: 'Rising Nightingale', min: 5 },
+  { name: 'Medical Aspirant', min: 0 },
+  { name: 'Rising Star', min: 5 },
   { name: 'Medical Maestro', min: 10 },
   { name: 'Clinical Commander', min: 15 },
   { name: 'Healthcare Hero', min: 20 },
-  { name: 'Master of Nursing', min: 25 },
+  { name: 'Master of Medicine', min: 25 },
   { name: 'Legendary Clinician', min: 30 },
   { name: 'Eminent Health Scholar', min: 40 },
   { name: 'Grandmaster Clinician', min: 50 },
@@ -252,7 +255,8 @@ const Dashboard = () => {
         score: attempt.score,
         totalQuestions: attempt.totalQuestions,
         correct: questions.filter(q => q.isCorrect),
-        incorrect: questions.filter(q => !q.isCorrect)
+        incorrect: questions.filter(q => !q.isCorrect && q.selectedOption !== null && q.selectedOption !== undefined),
+        skipped: questions.filter(q => q.selectedOption === null || q.selectedOption === undefined)
       };
     });
   })();
@@ -264,12 +268,10 @@ const Dashboard = () => {
         <AppBar position="sticky" elevation={1} sx={{ bgcolor: 'white', color: 'text.primary' }}>
           <Toolbar>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 4 }}>
-              <Avatar sx={{ bgcolor: 'primary.main' }}>
-                <LocalHospital />
-              </Avatar>
+              <Avatar src="/staff.png" sx={{ bgcolor: 'transparent' }} />
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  NurseHub
+                  Medic-grow
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', display: { xs: 'none', sm: 'block' } }}>
                   Premium Portal
@@ -1094,6 +1096,15 @@ const Dashboard = () => {
                                   variant="outlined"
                                   size="small"
                                 />
+                                <Button
+                                  variant="contained"
+                                  size="small"
+                                  startIcon={<Download />}
+                                  onClick={() => generateSessionPDF(session)}
+                                  sx={{ fontWeight: 'bold', textTransform: 'none', borderRadius: 2 }}
+                                >
+                                  PDF
+                                </Button>
                               </Box>
                             </Box>
 
@@ -1126,6 +1137,53 @@ const Dashboard = () => {
                                                   gap: 1.5
                                                 }}>
                                                   <Avatar sx={{ bgcolor: i === q.correct ? 'success.main' : i === q.selectedOption ? 'error.main' : 'grey.200', width: 20, height: 20, fontSize: '0.7rem' }}>
+                                                    {String.fromCharCode(65 + i)}
+                                                  </Avatar>
+                                                  <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{opt}</Typography>
+                                                  {i === q.correct && <CheckCircle fontSize="inherit" color="success" sx={{ ml: 'auto' }} />}
+                                                </Paper>
+                                              </Grid>
+                                            ))}
+                                          </Grid>
+                                          <Alert severity="info" icon={<Info fontSize="small" />} sx={{ py: 0 }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block' }}>RATIONALE</Typography>
+                                            <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{q.explanation}</Typography>
+                                          </Alert>
+                                        </AccordionDetails>
+                                      </Accordion>
+                                    ))}
+                                  </Stack>
+                                </Box>
+                              )}
+
+                              {/* Skipped Questions */}
+                              {session.skipped && session.skipped.length > 0 && (
+                                <Box sx={{ mb: 3 }}>
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2, color: 'grey.600', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Help fontSize="small" /> Unattempted Questions ({session.skipped.length})
+                                  </Typography>
+                                  <Stack spacing={1}>
+                                    {session.skipped.map((q, qIdx) => (
+                                      <Accordion key={q._id} sx={{ '&:before': { display: 'none' }, border: '1px solid', borderColor: 'grey.300', borderRadius: '8px !important' }}>
+                                        <AccordionSummary expandIcon={<ExpandMore />}>
+                                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            {qIdx + 1}. {q.question}
+                                          </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                          <Grid container spacing={1} sx={{ mb: 2 }}>
+                                            {q.options.map((opt, i) => (
+                                              <Grid size={{ xs: 12, sm: 6 }} key={i}>
+                                                <Paper sx={{ 
+                                                  p: 1.5, 
+                                                  border: '1px solid', 
+                                                  borderColor: i === q.correct ? 'success.light' : 'grey.100',
+                                                  bgcolor: i === q.correct ? 'success.50' : 'white',
+                                                  display: 'flex',
+                                                  alignItems: 'center',
+                                                  gap: 1.5
+                                                }}>
+                                                  <Avatar sx={{ bgcolor: i === q.correct ? 'success.main' : 'grey.200', width: 20, height: 20, fontSize: '0.7rem' }}>
                                                     {String.fromCharCode(65 + i)}
                                                   </Avatar>
                                                   <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{opt}</Typography>

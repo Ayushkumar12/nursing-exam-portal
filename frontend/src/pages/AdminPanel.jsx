@@ -170,15 +170,13 @@ const AdminPanel = () => {
       <AppBar position="sticky" elevation={1} sx={{ bgcolor: 'white', color: 'text.primary' }}>
         <Toolbar>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 4 }}>
-            <Avatar sx={{ bgcolor: 'primary.main' }}>
-              <ShieldCheckIcon />
-            </Avatar>
+            <Avatar src="/staff.png" sx={{ bgcolor: 'transparent' }} />
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                 Admin Panel
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'uppercase', display: { xs: 'none', sm: 'block' } }}>
-                Nursing Exam System
+                Medic-grow System
               </Typography>
             </Box>
           </Box>

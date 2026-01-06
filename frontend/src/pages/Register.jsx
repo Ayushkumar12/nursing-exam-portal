@@ -85,17 +85,16 @@ const Register = () => {
           {/* Header Section */}
           <Box textAlign="center" mb={4}>
             <Avatar
+              src="/staff.png"
               sx={{
                 width: { xs: 60, sm: 80 },
                 height: { xs: 60, sm: 80 },
-                bgcolor: 'secondary.main',
+                bgcolor: 'transparent',
                 mx: 'auto',
                 mb: 2,
                 boxShadow: 3
               }}
-            >
-              <LocalHospital sx={{ fontSize: { xs: 30, sm: 40 } }} />
-            </Avatar>
+            />
             <Typography
               variant="h3"
               component="h1"
@@ -109,10 +108,10 @@ const Register = () => {
                 WebkitTextFillColor: 'transparent'
               }}
             >
-              NurseHub
+              Medic-grow
             </Typography>
             <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-              Join the Nursing Community
+              Join the Healthcare Community
             </Typography>
           </Box>
 
@@ -265,7 +264,7 @@ const Register = () => {
           {/* Footer */}
           <Box textAlign="center" mt={4} pt={2} borderTop={1} borderColor="divider">
             <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>
-              © 2025 NurseHub Corporation • Enterprise Grade Security
+              © 2025 Medic-grow Corporation • Enterprise Grade Security
             </Typography>
           </Box>
         </Paper>

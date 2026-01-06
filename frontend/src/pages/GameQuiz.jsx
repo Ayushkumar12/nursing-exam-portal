@@ -237,9 +237,9 @@ const GameQuiz = () => {
     if (submitting) return;
     setSubmitting(true);
 
-    const formattedResponses = Object.keys(responses).map(index => ({
-      questionId: questions[index]._id,
-      selectedOption: questions[index].mapping[responses[index]]
+    const formattedResponses = questions.map((q, index) => ({
+      questionId: q._id,
+      selectedOption: responses[index] !== undefined ? q.mapping[responses[index]] : null
     }));
 
     try {

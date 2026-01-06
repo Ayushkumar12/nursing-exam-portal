@@ -37,13 +37,13 @@ router.post('/career-insight', auth, async (req, res) => {
       .map(([topic, stats]) => `${topic}: ${stats.correct}/${stats.total}`)
       .join(', ');
 
-    const prompt = `As an expert nursing career counselor, analyze this student's exam performance:
+    const prompt = `As an expert medical career counselor, analyze this student's exam performance:
     Exam: ${attempt.exam}
     Total Score: ${attempt.score}/${attempt.totalQuestions}
     Topic-wise Performance: ${performanceSummary}
     
     Provide a professional AI Career Insight (max 2-3 sentences).
-    1. Identify a potential nursing specialization they might excel in based on their strong topics.
+    1. Identify a potential healthcare specialization they might excel in based on their strong topics.
     2. Provide one specific, actionable advice for their career or study path.
     Keep the tone encouraging, professional, and clear. Do not use any markdown formatting like bold or tables, just plain text.`;
 
@@ -83,13 +83,13 @@ router.post('/chat', auth, async (req, res) => {
     }
 
     
-    const systemInstruction = `You are a professional medical assistant and educator for nursing students. 
-Your goal is to provide accurate, helpful, and encouraging information about medical topics, nursing practices, and exam preparation. 
+    const systemInstruction = `You are a professional medical assistant and educator for healthcare students. 
+Your goal is to provide accurate, helpful, and encouraging information about medical topics, healthcare practices, and exam preparation. 
 Always maintain a professional tone and emphasize patient safety and evidence-based practice.
 
 Student Information:
 - Name: ${user.name}
-- Current Focus: Nursing Exam Preparation
+- Current Focus: Medic-grow Exam Preparation
 - Recent Exam Performance:
 ${performanceSummary}
 

@@ -111,7 +111,7 @@ const ACHIEVEMENTS = {
   TWENTY_EXAMS: { title: 'Dedicated Learner', description: 'Completed 20 exams!', icon: '📚' },
   FIFTY_EXAMS: { title: 'Study Machine', description: 'Completed 50 exams!', icon: '⚙️' },
   HUNDRED_EXAMS: { title: 'Exam Century', description: 'Completed 100 exams!', icon: '🏅' },
-  TWO_HUNDRED_EXAMS: { title: 'Nursing Scholar', description: 'Completed 200 exams!', icon: '📜' },
+  TWO_HUNDRED_EXAMS: { title: 'Medical Scholar', description: 'Completed 200 exams!', icon: '📜' },
   FIVE_HUNDRED_EXAMS: { title: 'Knowledge Titan', description: 'Completed 500 exams!', icon: '🏛️' },
   NHM_FAN: { title: 'NHM Aspirant', description: 'Completed 10 NHM exams!', icon: '🏥' },
   CHO_FAN: { title: 'CHO Specialist', description: 'Completed 10 CHO exams!', icon: '👨‍⚕️' },
@@ -522,7 +522,7 @@ const checkAndAwardAchievements = async (userId, metadata = {}) => {
       } else if (totalAchievements >= 30) {
         user.title = 'Legendary Clinician';
       } else if (totalAchievements >= 25) {
-        user.title = 'Master of Nursing';
+        user.title = 'Master of Medicine';
       } else if (totalAchievements >= 20) {
         user.title = 'Healthcare Hero';
       } else if (totalAchievements >= 15) {
@@ -530,9 +530,9 @@ const checkAndAwardAchievements = async (userId, metadata = {}) => {
       } else if (totalAchievements >= 10) {
         user.title = 'Medical Maestro';
       } else if (totalAchievements >= 5) {
-        user.title = 'Rising Nightingale';
+        user.title = 'Rising Star';
       } else {
-        user.title = 'Nursing Aspirant';
+        user.title = 'Medical Aspirant';
       }
       await user.save();
     }

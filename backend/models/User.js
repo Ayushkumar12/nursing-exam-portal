@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   }],
   lastLogin: { type: Date },
   loginStreak: { type: Number, default: 0 },
-  title: { type: String, default: 'Nursing Aspirant' },
+  title: { type: String, default: 'Medical Aspirant' },
   chatbotUsageCount: { type: Number, default: 0 },
   storyGamesCompleted: { type: Number, default: 0 },
   successfulSimulations: { type: Number, default: 0 },

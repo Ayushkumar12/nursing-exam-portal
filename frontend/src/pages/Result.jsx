@@ -181,10 +181,13 @@ const Result = () => {
 
   const { attempt, questions, gameMode, gameStats, newAchievements } = state;
   const percentage = (attempt.score / attempt.totalQuestions) * 100;
+  const skippedCount = attempt.responses.filter(r => r.selectedOption === null || r.selectedOption === undefined).length;
+  const incorrectCount = attempt.totalQuestions - attempt.score - skippedCount;
 
   const chartData = [
     { name: 'Correct', value: attempt.score },
-    { name: 'Incorrect', value: attempt.totalQuestions - attempt.score },
+    { name: 'Incorrect', value: incorrectCount },
+    { name: 'Skipped', value: skippedCount },
   ];
 
   const getPerformanceMessage = () => {
@@ -268,8 +271,9 @@ const Result = () => {
                           endAngle={450}
                           stroke="none"
                         >
-                          <Cell fill={percentage >= 50 ? blue[600] : red[600]} />
-                          <Cell fill={grey[200]} />
+                          <Cell fill={green[600]} />
+                          <Cell fill={red[600]} />
+                          <Cell fill={grey[400]} />
                         </Pie>
                       </PieChart>
                     </ResponsiveContainer>
@@ -310,8 +314,8 @@ const Result = () => {
                       {message.sub}
                     </Typography>
 
-                    <Stack direction="row" spacing={3} justifyContent={{ xs: 'center', md: 'flex-start' }}>
-                      <Paper sx={{ p: 2, textAlign: 'center', minWidth: 100 }}>
+                    <Stack direction="row" spacing={2} justifyContent={{ xs: 'center', md: 'flex-start' }} flexWrap="wrap" useFlexGap>
+                      <Paper sx={{ p: 2, textAlign: 'center', minWidth: 90 }}>
                         <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary' }}>
                           Correct
                         </Typography>
@@ -319,12 +323,20 @@ const Result = () => {
                           {attempt.score}
                         </Typography>
                       </Paper>
-                      <Paper sx={{ p: 2, textAlign: 'center', minWidth: 100 }}>
+                      <Paper sx={{ p: 2, textAlign: 'center', minWidth: 90 }}>
                         <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary' }}>
                           Incorrect
                         </Typography>
                         <Typography variant="h4" sx={{ color: red[600], fontWeight: 'bold' }}>
-                          {attempt.totalQuestions - attempt.score}
+                          {incorrectCount}
+                        </Typography>
+                      </Paper>
+                      <Paper sx={{ p: 2, textAlign: 'center', minWidth: 90 }}>
+                        <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 'bold', color: 'text.secondary' }}>
+                          Skipped
+                        </Typography>
+                        <Typography variant="h4" sx={{ color: grey[600], fontWeight: 'bold' }}>
+                          {skippedCount}
                         </Typography>
                       </Paper>
                     </Stack>
@@ -480,21 +492,22 @@ const Result = () => {
               {questions.map((q, idx) => {
                 const resp = attempt.responses.find(r => r.questionId === q._id);
                 const isCorrect = resp?.isCorrect;
+                const isSkipped = resp?.selectedOption === null || resp?.selectedOption === undefined;
 
                 return (
                   <Accordion key={idx} sx={{ mb: 2 }}>
                     <AccordionSummary expandIcon={<ExpandMore />}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar sx={{ bgcolor: isCorrect ? green[600] : red[600] }}>
+                        <Avatar sx={{ bgcolor: isCorrect ? green[600] : isSkipped ? grey[500] : red[600] }}>
                           {idx + 1}
                         </Avatar>
                         <Box>
                           <Chip
-                            label={isCorrect ? "Valid Entry" : "Logic Failure"}
+                            label={isCorrect ? "Valid Entry" : isSkipped ? "Skipped" : "Logic Failure"}
                             size="small"
                             sx={{
-                              bgcolor: isCorrect ? green[50] : red[50],
-                              color: isCorrect ? green[700] : red[700],
+                              bgcolor: isCorrect ? green[50] : isSkipped ? grey[100] : red[50],
+                              color: isCorrect ? green[700] : isSkipped ? grey[700] : red[700],
                               mr: 1,
                             }}
                           />

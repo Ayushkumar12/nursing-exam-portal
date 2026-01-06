@@ -82,7 +82,7 @@ const ReportCard = ({ data }) => {
               <Box sx={{ mt: 1 }}>
                 <Chip 
                   icon={<School sx={{ color: 'white !important' }} />} 
-                  label={student.title || 'Nursing Student'} 
+                  label={student.title || 'Medical Student'} 
                   sx={{ 
                     bgcolor: 'rgba(255,255,255,0.2)', 
                     color: 'white', 
@@ -176,6 +176,7 @@ const ReportCard = ({ data }) => {
                 <TableCell sx={{ fontWeight: 700 }}>Exam Name</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="center">Score</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="center">Skipped</TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="center">Percentage</TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="right">Status</TableCell>
               </TableRow>
@@ -185,6 +186,7 @@ const ReportCard = ({ data }) => {
                 attempts.map((attempt, index) => {
                   const percentage = (attempt.score / attempt.totalQuestions) * 100;
                   const isPassed = percentage >= 50;
+                  const skippedCount = attempt.responses.filter(r => r.selectedOption === null || r.selectedOption === undefined).length;
                   
                   return (
                     <TableRow 
@@ -205,6 +207,9 @@ const ReportCard = ({ data }) => {
                         {attempt.score} / {attempt.totalQuestions}
                       </TableCell>
                       <TableCell align="center">
+                        {skippedCount}
+                      </TableCell>
+                      <TableCell align="center">
                         <Typography fontWeight={700} color={isPassed ? 'success.main' : 'error.main'}>
                           {percentage.toFixed(2)}%
                         </Typography>
@@ -223,7 +228,7 @@ const ReportCard = ({ data }) => {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">No attempts recorded yet.</Typography>
                   </TableCell>
                 </TableRow>
@@ -240,7 +245,7 @@ const ReportCard = ({ data }) => {
       >
         <Divider sx={{ mb: 2 }} />
         <Typography variant="caption" color="text.secondary">
-          This is an electronically generated report card. All scores are verified by NurseHub Examination Portal.
+          This is an electronically generated report card. All scores are verified by Medic-grow Examination Portal.
         </Typography>
       </Box>
     </Box>
