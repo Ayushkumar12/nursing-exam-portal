@@ -6,15 +6,14 @@ export const generateSessionPDF = (session) => {
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // Header
-  doc.setFontSize(20);
-  doc.setTextColor(33, 150, 243); // Primary Blue
-  doc.text('Medic-grow - Study Material', 14, 22);
+  doc.setFontSize(14);
+  doc.setTextColor(33, 150, 243); // Primary Blue  
   
-  doc.setFontSize(12);
+  doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text(`Exam: ${session.exam}`, 14, 32);
-  doc.text(`Date: ${new Date(session.date).toLocaleString()}`, 14, 38);
-  doc.text(`Score: ${session.score}/${session.totalQuestions} (${Math.round((session.score / session.totalQuestions) * 100)}%)`, 14, 44);
+  doc.text(`Exam: ${session.exam}`, 14, 22);
+  doc.text(`Date: ${new Date(session.date).toLocaleString()}`, 14, 27);
+  doc.text(`Score: ${session.score}/${session.totalQuestions} (${Math.round((session.score / session.totalQuestions) * 100)}%)`, 14, 32);
 
   // Combine correct, incorrect and skipped questions
   const allQuestions = [
@@ -33,19 +32,19 @@ export const generateSessionPDF = (session) => {
   ]);
 
   autoTable(doc, {
-    startY: 52,
+    startY: 38,
     head: [['#', 'Question', 'Correct Answer', 'Your Answer', 'Status', 'Reasoning']],
     body: tableData,
     headStyles: { fillColor: [33, 150, 243] },
     columnStyles: {
-      0: { cellWidth: 8 },
-      1: { cellWidth: 50 },
-      2: { cellWidth: 35 },
-      3: { cellWidth: 35 },
-      4: { cellWidth: 20 },
+      0: { cellWidth: 7 },
+      1: { cellWidth: 60 },
+      2: { cellWidth: 30 },
+      3: { cellWidth: 30 },
+      4: { cellWidth: 15 },
       5: { cellWidth: 'auto' }
     },
-    styles: { overflow: 'linebreak', cellPadding: 2, fontSize: 9 },
+    styles: { overflow: 'linebreak', cellPadding: 1, fontSize: 7 },
     didParseCell: function(data) {
       if (data.section === 'body' && data.column.index === 4) {
         if (data.cell.raw === 'Correct') {
