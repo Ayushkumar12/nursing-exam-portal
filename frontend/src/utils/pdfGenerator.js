@@ -26,39 +26,21 @@ export const generateSessionPDF = (session) => {
     index + 1,
     q.question,
     q.options[q.correct] || 'N/A',
-    q.options[q.selectedOption] || 'N/A',
-    q.status,
     q.explanation || 'No reasoning provided.'
   ]);
 
   autoTable(doc, {
     startY: 38,
-    head: [['#', 'Question', 'Correct Answer', 'Your Answer', 'Status', 'Reasoning']],
+    head: [['#', 'Question', 'Correct Answer', 'Reasoning']],
     body: tableData,
     headStyles: { fillColor: [33, 150, 243] },
     columnStyles: {
-      0: { cellWidth: 7 },
-      1: { cellWidth: 60 },
-      2: { cellWidth: 30 },
-      3: { cellWidth: 30 },
-      4: { cellWidth: 15 },
-      5: { cellWidth: 'auto' }
+      0: { cellWidth: 10 },
+      1: { cellWidth: 80 },
+      2: { cellWidth: 40 },
+      3: { cellWidth: 'auto' }
     },
-    styles: { overflow: 'linebreak', cellPadding: 1, fontSize: 7 },
-    didParseCell: function(data) {
-      if (data.section === 'body' && data.column.index === 4) {
-        if (data.cell.raw === 'Correct') {
-          data.cell.styles.textColor = [76, 175, 80]; // Green
-          data.cell.styles.fontStyle = 'bold';
-        } else if (data.cell.raw === 'Incorrect') {
-          data.cell.styles.textColor = [244, 67, 54]; // Red
-          data.cell.styles.fontStyle = 'bold';
-        } else if (data.cell.raw === 'Skipped') {
-          data.cell.styles.textColor = [158, 158, 158]; // Grey
-          data.cell.styles.fontStyle = 'bold';
-        }
-      }
-    }
+    styles: { overflow: 'linebreak', cellPadding: 1, fontSize: 8 }
   });
 
   doc.save(`${session.exam}_Session_${new Date(session.date).toLocaleDateString().replace(/\//g, '-')}.pdf`);
