@@ -11,9 +11,8 @@ export const generateSessionPDF = (session) => {
   
   doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text(`Exam: ${session.exam}`, 14, 22);
-  doc.text(`Date: ${new Date(session.date).toLocaleString()}`, 14, 27);
-  doc.text(`Score: ${session.score}/${session.totalQuestions} (${Math.round((session.score / session.totalQuestions) * 100)}%)`, 14, 32);
+  doc.text(`Exam: ${session.exam}`, 14, 10);
+  doc.text(`Date: ${new Date(session.date).toLocaleString()}`, 14, 15);
 
   // Combine correct, incorrect and skipped questions
   const allQuestions = [
@@ -30,7 +29,7 @@ export const generateSessionPDF = (session) => {
   ]);
 
   autoTable(doc, {
-    startY: 38,
+    startY: 20,
     head: [['#', 'Question', 'Correct Answer', 'Reasoning']],
     body: tableData,
     headStyles: { fillColor: [33, 150, 243] },
