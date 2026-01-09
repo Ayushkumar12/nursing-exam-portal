@@ -116,7 +116,7 @@ const Result = () => {
       });
     };
     window.addEventListener('resize', handleResize);
-    
+
     if (state?.newAchievements && state.newAchievements.length > 0) {
       setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 8000);
@@ -343,7 +343,7 @@ const Result = () => {
                   </Box>
                 </Card>
               </Fade>
-              
+
               {/* Newly Earned Achievements */}
               {newAchievements && newAchievements.length > 0 && (
                 <Box sx={{ mb: 6 }}>
@@ -352,8 +352,8 @@ const Result = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: "spring", stiffness: 260, damping: 20 }}
                   >
-                    <Card sx={{ 
-                      p: { xs: 3, sm: 6 }, 
+                    <Card sx={{
+                      p: { xs: 3, sm: 6 },
                       textAlign: 'center',
                       background: 'linear-gradient(135deg, #FFF9C4 0%, #FFFDE7 100%)',
                       border: '3px solid',
@@ -362,11 +362,11 @@ const Result = () => {
                       overflow: 'visible'
                     }}>
                       <motion.div
-                        animate={{ 
+                        animate={{
                           rotate: [0, -10, 10, -10, 10, 0],
                           y: [0, -20, 0]
                         }}
-                        transition={{ 
+                        transition={{
                           duration: 2,
                           repeat: Infinity,
                           repeatType: "loop"
@@ -379,7 +379,7 @@ const Result = () => {
                       <Typography variant="h3" sx={{ fontWeight: 'black', color: '#856404', mb: 2, textTransform: 'uppercase', letterSpacing: 2 }}>
                         New Achievement Unlocked!
                       </Typography>
-                      
+
                       <Typography variant="h6" sx={{ color: '#856404', mb: 4, opacity: 0.8 }}>
                         You're on fire! Your dedication is truly impressive.
                       </Typography>
@@ -392,19 +392,19 @@ const Result = () => {
                               animate={{ x: 0, opacity: 1 }}
                               transition={{ delay: index * 0.2 + 0.5 }}
                             >
-                              <Paper sx={{ 
-                                p: 3, 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 3, 
+                              <Paper sx={{
+                                p: 3,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 3,
                                 bgcolor: 'white',
                                 borderRadius: 4,
                                 boxShadow: '0 8px 32px rgba(133, 100, 4, 0.1)',
                                 border: '1px solid',
                                 borderColor: 'amber.100'
                               }}>
-                                <Avatar sx={{ 
-                                  bgcolor: '#FFD700', 
+                                <Avatar sx={{
+                                  bgcolor: '#FFD700',
                                   color: 'white',
                                   width: 64,
                                   height: 64,
@@ -524,7 +524,10 @@ const Result = () => {
                       <Grid container spacing={2} sx={{ mb: 3 }}>
                         {q.options.map((opt, i) => {
                           const isOptionCorrect = i === q.correct;
-                          const isOptionSelected = i === resp?.selectedOption;
+                          // Check if mapping exists (for shuffled questions) or fallback to direct index
+                          const isOptionSelected = q.mapping
+                            ? q.mapping[i] === resp?.selectedOption
+                            : i === resp?.selectedOption;
 
                           return (
                             <Grid size={{ xs: 12, sm: 6 }} key={i}>
@@ -552,7 +555,7 @@ const Result = () => {
                                   {opt}
                                 </Typography>
                                 {isOptionCorrect && <CheckCircle color="success" />}
-                                {isOptionSelected && !isCorrect && <Cancel color="error" />}
+                                {isOptionSelected && !isOptionCorrect && <Cancel color="error" />}
                               </Paper>
                             </Grid>
                           );
