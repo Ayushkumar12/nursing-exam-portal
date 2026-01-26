@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   // baseURL: 'http://localhost:5000/api',
-  baseURL: 'https://nursing-exam-portal.onrender.com/api',
+  baseURL: 'https://api2.metacode.co.in/api',
 });
 
 api.interceptors.request.use((config) => {
