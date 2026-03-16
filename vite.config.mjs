@@ -21,7 +21,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://api2.metacode.co.in/',
+        target: 'https://nursing-exam-portal.onrender.com/',
         changeOrigin: true,
       },
     },
